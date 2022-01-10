@@ -1,0 +1,37 @@
+\documentclass[11pt]{article}
+\begin{document}
+\title{CSE13s asgn1 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date {1/6/2022}
+\maketitle
+\section{Program Details}\label{ss:details}
+This program uses gnuplot to create a graph using the Collatz sequence starting from n, a positive integer. Each number in this sequence is based on the previous number in this sequence. If the previous number is odd, then the number equals1 + 3s, with s being the sequence number. If the previous number is even, the next number is 1/2 s, with s being the sequence number again. Using gnuplot, we will make a program to output graphs with different axis labels to show different graphs regarding the Collatz sequence. 
+
+\section{Files to be included}\label{ss:files}
+\begin{enumerate}
+	\item plot.sh
+	\begin{itemize}
+		\item creates the graphs of the collatz sequence. Should include onge graph with the length of the sequence, one with the maximum value in the sequence, and one histogram graph with the frequencies and lengths in the sequence.
+	\end{itemize}
+	\item collatz.c
+	\begin{itemize}
+		\item provided file that gives the collatz sequence for plot.sh to put into the graphs and plots
+	\end{itemize}
+	\item Makefile
+	\begin{itemize}
+		\item uses clang commands to create an executable file of collatz.c
+	\end{itemize}
+	\item README.md
+	\begin{itemize}
+		\item file that displays the functionality of the program, how to build it, and the process of designing the program.
+	\end{itemize}
+	\item DESIGN.pdf
+	\begin{itemize}
+		\item document that shows ideas, pseudocode, and other details regarding the assignment (file list in directory, program description, errors and obstacles in programming)
+	\end{itemize}
+\end{enumerate}
+\section{Pseudocode/Program ideas}\label{ss:pseudo}
+head command prints a certain amount of lines in a file, so using the head command after saving the output of collatz.c to another file can give me the "x" amount of lines that I can use in gnuplot to graph\\ \\head -n number of collatz values values.txt\\ \\using file redirection, we can give the text file with the collatz values in them to plot.sh, allowing the program to access n values of the collatz sequence and put them into gnuplot.\\ \\for loops and echo to number the sequence in order to access length\\run collatz -n to get specific numbers of the sequence and store them into temporary file.\\ Delete file and remake it as the program runs to make sure it doesn't have overlapping data.\\use pipes to connect head, sort and wc commands to the collatz data files and change the data so that the program can read it correctly.\\gnuplot start\\set gnuplot parameters\\plot data file\\end gnuplot\\repeat for the different graph types and change the way data is read into the files\\use gnuplot command help to find functions and how to plot the different graph types
+\section{Other comments about the program and problems encountered}\label{cc:comments}
+Making the program was confusing at first with using gnuplot and using file reirection at the beginning. Following the instructions and looking at the resources for this assignment gave me a better understanding of how to use gnuplot, though it took me a while to understand it. I have run into many errors regarding gnuplot commands, but reading through help commands in the gnuplot has helped me learn what I can and can't do when it comes to plotting in specific. I watched and learned a lot from  Eugene's Lab section in order to get myself on track and many of my ideas came from his section and explanations. 
+\end{document}
