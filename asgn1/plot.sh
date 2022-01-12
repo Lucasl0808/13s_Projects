@@ -3,6 +3,7 @@
 rm -f /tmp/length.dat
 rm -f /tmp/values.dat
 rm -f /tmp/histogram.dat
+rm -f /tmp/histograms.dat
 
 for n in {2..10000};do
     echo -n "$n " >> /tmp/length.dat
@@ -12,7 +13,7 @@ for n in {2..10000};do
     ./collatz -n $n | wc -l >> /tmp/histogram.dat
 done
 
-cat /tmp/histogram.dat | uniq -c | less  >> /tmp/histograms.dat
+sort -n /tmp/histogram.dat | uniq -c | less >> /tmp/histograms.dat
 
 gnuplot <<END
     set terminal pdf
@@ -43,7 +44,9 @@ gnuplot <<END
     set xlabel "length"
     set ylabel "frequency"
     set xrange [0:225]
+    set xtics (0, 25, 50, 75, 100, 125, 150, 175, 200, 225)
     set yrange [0:200]
-    plot "/tmp/histograms.dat" using 2:xticlabels(1) with histograms
+    set ytics (0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200)
+    plot "/tmp/histograms.dat" using 2:1 with boxes
 END
 
