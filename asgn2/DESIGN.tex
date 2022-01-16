@@ -1,0 +1,97 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn2 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{1/14/2022}
+\begin{document}\maketitle
+
+\section{Program Details}\label{ss:details}
+This program is designed to create a library of math functions inside of a file called mathlib.c. We must create an exponent function that displays:
+\begin{enumerate}
+	\item function that approximates \(e^x\)
+\item function that approximates sin(x)
+\item function that approximates cos(x)
+\item function that approximates $\sqrt{x}$
+\item function that approximates log(x)
+\item function that uses Simpson's 1/3 rule for integration using the previous functions
+\end{enumerate}
+We will need to use \(\epsilon = 10^-14\) to limit the computations.
+
+\section{Pseudocode/Program Ideas}\label{ss:pseudocode}
+Making \(e^x\):
+\begin{enumerate}
+	\item initialize x and k
+	\item for loop that uses $\epsilon$ to check differences(floating point absolute value) and break loop when approximation is close to the value of $\epsilon$
+	\begin{enumerate}
+		\item  multiply previous x/k! by x/k
+			\begin{enumerate}
+				\item use local variables to keep track of previous values in order to computer factorial without using a factorial command
+			\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+Making Sin(x) and Cos(x):
+\begin{enumerate}
+	\item initialize local variables(most likely need about 3-5 to placehold numbers)
+		\begin{enumerate}
+			\item while loop checks if floating point absolute value is greater than $\epsilon$
+			\begin{enumerate}
+				\item implement \(\frac{x^n}{n!} + (-1)^n \frac{x^n+2}{n+2!}\)
+				\item for Cos(x) start at 0 instead of x and implement a similar function to Sin(x) 
+				\item variables hold previous values - use for factorials
+				\item variable that holds n value, and also one that controls the (-1) coefficient.
+			\end{enumerate}
+		\end{enumerate}
+\end{enumerate}
+Making \(\sqrt{x}\) and log(x):
+\begin{enumerate}
+	\item set variables x and y, y being equal to \(x^2\), as well as a n or k variable to keep track of iterations.
+	\item create while loop that compares floating point abs to $\epsilon$.
+	\begin{enumerate}
+		\item take half of the given x + \(\frac{y}{x_{k or n}}\)
+		\item return that number after loop breaks
+	
+	\end{enumerate}
+\end{enumerate}
+
+Making log(x)
+\begin{enumerate}
+	\item log(x) function will need to incorporate our exp() function to get \(e^x\)
+	\item log(0) does not exist, so we start at x + 1.
+	\item make vars and while loop checking for $\epsilon$ again with floating point abs.
+	\begin{enumerate}
+		\item since \(e^x\) is the inverse of log(x), we use it in our function to invert back to that form when it's used.
+		\item implement a similar function to \(\sqrt{x}\), except use y - \(e^x\) and its derivative instead of \(x^2 - y\).
+	\end{enumerate}
+\end{enumerate}
+Lastly: the integrate(function pointer, lower bound a, upper bound b, unsigned integer n) function:
+\begin{enumerate}
+	\item This integrate function uses Simpson's 1/3 rule.
+	\item The function pointer takes a single double value as an input, so we can do arithmetic inside function-pointer(...) in order to get a value we want.
+	\item We can follow a similar structure to the Simpson's 3/8 rule in the pdf for the assignment.
+	\item Set sum equal to f(lower bound) + f(upper bound)
+	\item Set h = (b-a)/n (as stated in asgn2 document)
+	\item for loop (lets call current loop iteration i)from 1 to n
+	\begin{enumerate}
+		\item if conditional = odd/even
+		\begin{enumerate}
+			\item if even add to sum: 2 * f(a + i(2((b-a)/n)))
+			\item if odd add to sum:  4 * f(a + i(2((b-a)/n)-1))
+		\end{enumerate}
+	\item after loop finishes, add to sum: h/3.
+	\end{enumerate}
+\end{enumerate}
+
+Above are the programs for the mathlib.c file that should contain the math library functions.
+The Makefile for this assignment should use clang commands, clang flag commands, build the integrate executable file with linkers, clean files that the compiler makes, and format source code.
+\section{Files}\label{ss:files}
+\begin{enumerate}
+	\item functions.c - file is provided: contains function implementations that
+	\item functions.h - file is provided: header file for functions.c shows functions that should be in main program
+	\item integrate.c - contains integrate() and main() functions that integrate functions based on command line inputs
+	\item mathlib.c - contains above programs for math library
+	\item mathlib.h - contains implementation of mathlib.c functions
+	\item Makefile - stated above
+	\item README.md - markdown formatted document that describes how to use the program and other bugs/errors in program
+	\item DESIGN.pdf - this document: describes program details and pseudocode for the programs
+	\item WRITEUP.pdf - pdf that includes graphs of each function when plotted using gnuplot, as well as other tools used to finish the project. Graphs should use relative difference and other ideas relating to floating point numbers.
+\end{enumerate}
+\end{document}
