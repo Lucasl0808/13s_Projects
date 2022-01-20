@@ -82,6 +82,25 @@ Lastly: the integrate(function pointer, lower bound a, upper bound b, unsigned i
 
 Above are the programs for the mathlib.c file that should contain the math library functions.
 The Makefile for this assignment should use clang commands, clang flag commands, build the integrate executable file with linkers, clean files that the compiler makes, and format source code.
+For integrate.c I will need to be able to take arguments from command line using argc and **argv.
+\begin{enumerate}
+	\item main function:
+	\begin{enumerate}
+		\item create opt, boolean values for each option
+		\item create a variable as function pointer
+		\item while loop: conditional = getopt != -1
+		\begin{enumerate}
+			\item switch opt
+			\item for each case, set corresponding boolean to true and set function pointer equal to corresponding function from functions.c.
+			\item store number variables using strtod and optarg
+			\item allow the input of "pi" in command line by comparing strings
+			\item make a default case and H case that prints options
+		\end{enumerate}
+		\item conditionals that check each case's boolean operator
+		\item run integrate in each conditional for increasing number of partitions.
+	\end{enumerate}
+	\item return int
+\end{enumerate}
 \section{Files}\label{ss:files}
 \begin{enumerate}
 	\item functions.c - file is provided: contains function implementations that
