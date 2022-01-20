@@ -15,7 +15,7 @@ mathlib.o: mathlib.c
 	$(CC) $(CFLAGS) -c mathlib.c -o mathlib.o 
 
 clean: 
-	rm - f integrate integrate.o
+	rm -f integrate integrate.o mathlib.o
 
 format: 
-	clang-format -i -style=file integrate.c mathlib.c mathlib.h
+	clang-format -i -style=file *.[ch]
