@@ -1,0 +1,204 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn3 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{1/21/2022}
+\begin{document}\maketitle
+
+\section{Program Details}\label{ss:details}
+In this program we will have to make an Insertion Sort, Batcher Sort, Heapsort, and Quicksort based on python pseudocode in C. We will then implement a test function in order to test each sorting method using random seeds. This test case should gather the size of the array to sort, number of moves needed to sort the array, and number of times values are compared in the array.
+
+\section{Pseudocode and ideas}\label{ss:pseudocode}
+Insertion Sort:
+\begin{enumerate}
+\item insertion sort(stats struct pointer, uint32t array, length of array)
+	\begin{enumerate}
+	\item for loop from (1 - array length):
+		\begin{enumerate}
+		\item j = current loop iteration
+		\item x = current array value
+		\item while j > 0 and x < array value at j-1
+			\begin{enumerate}
+			\item value at j = value at j - 1
+			\item j -= 1
+			\end{enumerate}
+		\item value at j = x
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+Heapsort (needs maintenance code and sort code):
+Maxchild (highest of the two children):
+\begin{enumerate}
+\item maxchild(list, int first, int last)
+	\begin{enumerate}
+	\item left = first * 2
+	\item right = left +1
+	\item if right <= last and (array value at right -1) > (array value at left -1)
+		\begin{enumerate}
+		\item return right
+		\end{enumerate}
+	\item return left
+	\end{enumerate}
+\end{enumerate}
+
+Fixheap(fixes heap after you change the mother and father values)
+\begin{enumerate}
+\item fixheap(array, int first, int last)
+	\begin{enumerate}
+	\item found = false
+	\item mother = first
+	\item greater = maxchild(array, mother, last) -> finds greater of the two children and stores into greater
+	\item while mother <= (last // 2) and found == false -> floor division
+		\begin{enumerate}
+		\item if (array at mother -1) < (array at greater - 1)
+			\begin{enumerate}
+			\item switch (array at mother -1) and (array at greater -1)
+			\item mother = greater
+			\item greater = maxchild(array, mother, last)
+			\end{enumerate}
+		\item else found = true
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+build heap -> creates heap for the sort algorithm
+\begin{enumerate}
+\item buildheap(array, int first, int last)
+	\begin{enumerate}
+	\item for father in range from (last // 2, to first -1, -1) -> floor division on last, to first -1 stepping from -1 forward, meaning it counts backwards from last to first
+		\begin{enumerate}
+		\item fixheap(array, father, last)
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+Sort algorithm:
+\begin{enumerate}
+\item heapsort(stats struct pointer, uint32t array, array length)
+	\begin{enumerate}
+	\item first = 1, last = array length
+	\item call buildheap(array, first, last)
+	\item for i in range(last, first, -1) -> counting backwards from last to first
+		\begin{enumerate}
+		\item swap (array at first - 1) and (array at i -1)
+		\item fixheap(array, first, i -1)
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+Quicksort
+Partitions:
+\begin{enumerate}
+\item partition(array, int low, int high)
+	\begin{enumerate}
+	\item i = low - 1
+	\item for x in range(low, high)
+		\begin{enumerate}
+		\item if (array at j-1) < (array at high -1)
+			\begin{enumerate}
+			\item i++
+			\item (array at i-1) swaps with (array at j -1)
+			\end{enumerate}
+		\item (array at i) swaps with (array at high -1)
+		\end{enumerate}
+	\item return i + 1
+	\end{enumerate}
+\end{enumerate}
+
+Quicksort Sorting Algorithm
+\begin{enumerate}
+\item quicksort(array, int low, int high)
+	\begin{enumerate}
+	\item if low < high
+		\begin{enumerate}
+		\item int p = partition(array, low, high)
+		\item quicksort(A, low, p -1)
+		\item quicksort(A, p + 1, high)
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+Function that actually runs this recursive function
+\begin{enumerate}
+\item quicksorter(array)
+	\begin{enumerate}
+	\item quicksort(array, 1, length(array))
+	\end{enumerate}
+\end{enumerate}
+
+Batcher's Odd-Even Merge Sort
+function comparator:
+\begin{enumerate}
+\item comparator(array, int x, int y)
+	\begin{enumerate}
+	\item if (array at x) > (array at y)
+		\begin{enumerate}
+		\item swap (array at x) with (array at y)
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+Function that runs the batcher sort
+\begin{enumerate}
+\item batchersort(array)
+	\begin{enumerate}
+	\item if length(array) == 0 ->base case
+		\begin{enumerate}
+		\item return nothing -> exit function
+		\end{enumerate}
+	\item n = length(array)
+	\item t = bit length of n
+	\item p = 1 shifted left by (t -1) bits
+	\item while p > 0
+		\begin{enumerate}
+		\item q = 1 shifted left by (t -1) bits
+		\item r = 0
+		\item d = p
+		\item while d > 0
+			\begin{enumerate}
+			\item for x in range(0, n-d)
+				\begin{enumerate}
+				\item if (i and p) == r -> bitwise and
+				\begin{enumerate}
+				\item comparator(array, i, i + d)
+				\end{enumerate}
+				\end{enumerate}
+			\item d = q - p
+			\item q = q shifted right by 1 bit
+			\item r = p
+			\end{enumerate}
+		\item p = p shifted right by 1 bit
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+
+\section{Files}\label{ss:files}
+\begin{enumerate}
+\item batcher.c and batcher.h -> implementation batcher sort and header file for batcher sort
+\item insert.c and insert.h -> implementation of insertion sort and header file for insertion sort
+\item heap.c and heap.h -> implementation of heap sort and header file for heap sort
+\item quick.c and quick.h -> implementation of quicksort and header file for quicksort
+\item set.h implements sets that we will use for bitwise operations when keeping track of command line inputs.
+\item stats.c and stats.h -> implements stats file we use to keep track of data from sorting, and the header file.
+\item sorting.c -> main function that runs and tests sorting functions using command line inputs.
+\item Makefile uses clang commands, make all, make sorting, make clean, and make format
+\item README.md describes how to use Makefile and compile/run the program
+\item DESIGN.pdf describes how the programmer will make the code and complete the implementations of the sorting algorithms.
+\item WRITEUP.pdf shows what I learned from implementing the sorting algorithms and conclusions about the project. Includes data about the sorting outputs.
+\end{enumerate}
+\section{Main function}\label{ss:main}
+Main function that takes argc and argv:
+\begin{enumerate}
+\item initialize variables as needed
+	\begin{enumerate}
+	\item switch operator and check for inputs
+	\item if -a then call all 4 sorting algs
+	\item if -h call heap sort
+	\item if -b call batcher sort
+	\item if -i call insertion sort
+	\item if -q call quicksort
+	\item if -r: then set random seed to user input
+	\item if -n: then set array size to user input
+	\item if -p: then print user input elements from the array. Default is 100
+	\item if -H then print usage statement for program that tells the user how to use the program.
+	\end{enumerate}
+\end{enumerate}
+\end{document}
