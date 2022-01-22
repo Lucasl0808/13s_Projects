@@ -16,7 +16,7 @@ Insertion Sort:
 		\begin{enumerate}
 		\item j = current loop iteration
 		\item x = current array value
-		\item while j > 0 and x < array value at j-1
+		\item while j greater than 0 and x less than (array value at j-1)
 			\begin{enumerate}
 			\item value at j = value at j - 1
 			\item j -= 1
@@ -33,7 +33,7 @@ Maxchild (highest of the two children):
 	\begin{enumerate}
 	\item left = first * 2
 	\item right = left +1
-	\item if right <= last and (array value at right -1) > (array value at left -1)
+	\item if right less than or = last and (array value at right -1) less than (array value at left -1)
 		\begin{enumerate}
 		\item return right
 		\end{enumerate}
@@ -47,10 +47,10 @@ Fixheap(fixes heap after you change the mother and father values)
 	\begin{enumerate}
 	\item found = false
 	\item mother = first
-	\item greater = maxchild(array, mother, last) -> finds greater of the two children and stores into greater
-	\item while mother <= (last // 2) and found == false -> floor division
+	\item greater = maxchild(array, mother, last)  finds greater of the two children and stores into greater
+	\item while mother less than or = (last // 2) and found == false (floor division)
 		\begin{enumerate}
-		\item if (array at mother -1) < (array at greater - 1)
+		\item if (array at mother -1) less than (array at greater - 1)
 			\begin{enumerate}
 			\item switch (array at mother -1) and (array at greater -1)
 			\item mother = greater
@@ -61,11 +61,11 @@ Fixheap(fixes heap after you change the mother and father values)
 	\end{enumerate}
 \end{enumerate}
 
-build heap -> creates heap for the sort algorithm
+build heap creates heap for the sort algorithm
 \begin{enumerate}
 \item buildheap(array, int first, int last)
 	\begin{enumerate}
-	\item for father in range from (last // 2, to first -1, -1) -> floor division on last, to first -1 stepping from -1 forward, meaning it counts backwards from last to first
+		\item for father in range from (last // 2, to first -1, -1)  (floor division on last, to first -1 stepping from -1 forward, meaning it counts backwards from last to first)
 		\begin{enumerate}
 		\item fixheap(array, father, last)
 		\end{enumerate}
@@ -78,7 +78,7 @@ Sort algorithm:
 	\begin{enumerate}
 	\item first = 1, last = array length
 	\item call buildheap(array, first, last)
-	\item for i in range(last, first, -1) -> counting backwards from last to first
+	\item for i in range(last, first, -1)  counting backwards from last to first
 		\begin{enumerate}
 		\item swap (array at first - 1) and (array at i -1)
 		\item fixheap(array, first, i -1)
@@ -94,7 +94,7 @@ Partitions:
 	\item i = low - 1
 	\item for x in range(low, high)
 		\begin{enumerate}
-		\item if (array at j-1) < (array at high -1)
+		\item if (array at j-1) less than (array at high -1)
 			\begin{enumerate}
 			\item i++
 			\item (array at i-1) swaps with (array at j -1)
@@ -109,7 +109,7 @@ Quicksort Sorting Algorithm
 \begin{enumerate}
 \item quicksort(array, int low, int high)
 	\begin{enumerate}
-	\item if low < high
+	\item if low less than high
 		\begin{enumerate}
 		\item int p = partition(array, low, high)
 		\item quicksort(A, low, p -1)
@@ -130,7 +130,7 @@ function comparator:
 \begin{enumerate}
 \item comparator(array, int x, int y)
 	\begin{enumerate}
-	\item if (array at x) > (array at y)
+	\item if (array at x) greater than (array at y)
 		\begin{enumerate}
 		\item swap (array at x) with (array at y)
 		\end{enumerate}
@@ -140,23 +140,23 @@ Function that runs the batcher sort
 \begin{enumerate}
 \item batchersort(array)
 	\begin{enumerate}
-	\item if length(array) == 0 ->base case
+	\item if length(array) == 0 base case
 		\begin{enumerate}
-		\item return nothing -> exit function
+		\item return nothing, exit function
 		\end{enumerate}
 	\item n = length(array)
 	\item t = bit length of n
 	\item p = 1 shifted left by (t -1) bits
-	\item while p > 0
+	\item while p greater than 0
 		\begin{enumerate}
 		\item q = 1 shifted left by (t -1) bits
 		\item r = 0
 		\item d = p
-		\item while d > 0
+		\item while d greater than 0
 			\begin{enumerate}
 			\item for x in range(0, n-d)
 				\begin{enumerate}
-				\item if (i and p) == r -> bitwise and
+				\item if (i and p) == r  bitwise and
 				\begin{enumerate}
 				\item comparator(array, i, i + d)
 				\end{enumerate}
@@ -172,13 +172,13 @@ Function that runs the batcher sort
 
 \section{Files}\label{ss:files}
 \begin{enumerate}
-\item batcher.c and batcher.h -> implementation batcher sort and header file for batcher sort
-\item insert.c and insert.h -> implementation of insertion sort and header file for insertion sort
-\item heap.c and heap.h -> implementation of heap sort and header file for heap sort
-\item quick.c and quick.h -> implementation of quicksort and header file for quicksort
+\item batcher.c and batcher.h = implementation batcher sort and header file for batcher sort
+\item insert.c and insert.h = implementation of insertion sort and header file for insertion sort
+\item heap.c and heap.h = implementation of heap sort and header file for heap sort
+\item quick.c and quick.h = implementation of quicksort and header file for quicksort
 \item set.h implements sets that we will use for bitwise operations when keeping track of command line inputs.
-\item stats.c and stats.h -> implements stats file we use to keep track of data from sorting, and the header file.
-\item sorting.c -> main function that runs and tests sorting functions using command line inputs.
+\item stats.c and stats.h = implements stats file we use to keep track of data from sorting, and the header file.
+\item sorting.c = main function that runs and tests sorting functions using command line inputs.
 \item Makefile uses clang commands, make all, make sorting, make clean, and make format
 \item README.md describes how to use Makefile and compile/run the program
 \item DESIGN.pdf describes how the programmer will make the code and complete the implementations of the sorting algorithms.
