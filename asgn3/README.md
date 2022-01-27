@@ -7,7 +7,10 @@ $make sorting
 
 ## Run Code
 
-./sorting [sorting method] [n length] [p elements to print] [r random seed]
+./sorting [ahibq] [n length] [p elements to print] [r random seed]
+length default = 100
+elements to print default = 100
+random seed default = 13371453
 
 ## Issues
 
