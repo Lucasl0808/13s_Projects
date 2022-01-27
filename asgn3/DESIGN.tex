@@ -156,10 +156,10 @@ Function that runs the batcher sort
 			\begin{enumerate}
 			\item for x in range(0, n-d)
 				\begin{enumerate}
-				\item if (i and p) == r  bitwise and
-				\begin{enumerate}
-				\item comparator(array, i, i + d)
-				\end{enumerate}
+					\item if (i and p) == r  bitwise and
+					\begin{enumerate}
+					\item comparator(array, i, i + d)
+					\end{enumerate}
 				\end{enumerate}
 			\item d = q - p
 			\item q = q shifted right by 1 bit
@@ -188,17 +188,26 @@ Function that runs the batcher sort
 Main function that takes argc and argv:
 \begin{enumerate}
 \item initialize variables as needed
+\item make a variable for each sort that enables them 
 	\begin{enumerate}
 	\item switch operator and check for inputs
-	\item if -a then call all 4 sorting algs
-	\item if -h call heap sort
-	\item if -b call batcher sort
-	\item if -i call insertion sort
-	\item if -q call quicksort
+	\item if -a enable all sorts by adding all sorts to set
+	\item if -h enable heap sort by adding it to set
+	\item if -b enable batcher sort by adding it to set
+	\item if -i enable insertion sort by adding it to set
+	\item if -q enable quicksort by adding it to set
 	\item if -r: then set random seed to user input
 	\item if -n: then set array size to user input
 	\item if -p: then print user input elements from the array. Default is 100
 	\item if -H then print usage statement for program that tells the user how to use the program.
 	\end{enumerate}
+\item use malloc and allocate space for an array of uint32s
+\item for loop for length of array that initializes the array to random values masked to 30 bits by using bitwise shifting
+\item for each of enabled sorts:
+	\begin{enumerate}
+	\item run corresponding sort and print out desired output
+	\item conditionals that check if p value is 0, less than array length, or greater than array length to determine what to print out.
+	\end{enumerate}
 \end{enumerate}
+
 \end{document}
