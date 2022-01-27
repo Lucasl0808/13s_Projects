@@ -183,6 +183,8 @@ Function that runs the batcher sort
 \item README.md describes how to use Makefile and compile/run the program
 \item DESIGN.pdf describes how the programmer will make the code and complete the implementations of the sorting algorithms.
 \item WRITEUP.pdf shows what I learned from implementing the sorting algorithms and conclusions about the project. Includes data about the sorting outputs.
+\item plot.sh file that produces the graphs using sorting.c
+\item figs directory that contains my graphs used in the writeup
 \end{enumerate}
 \section{Main function}\label{ss:main}
 Main function that takes argc and argv:
@@ -208,6 +210,7 @@ Main function that takes argc and argv:
 	\item run corresponding sort and print out desired output
 	\item conditionals that check if p value is 0, less than array length, or greater than array length to determine what to print out.
 	\end{enumerate}
+\item use free for every malloc command to avoid memory leaks
 \end{enumerate}
 
 \end{document}
