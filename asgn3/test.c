@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 //This code is for testing each function individually before going into sorting.c
 //This is also for testing the malloc command to initialize arrays
 void printarray(uint32_t A[], int n) {
