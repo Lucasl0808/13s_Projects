@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn4 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{1/28/2022}
+\begin{document}\maketitle
+
+\section{Program Details}\label{ss:details}
+In this program we will make a game of life. The game uses a 2x2 grid as an ADT, and the game follows three rules.
+\begin{enumerate}
+	\item live cells stay alive if two or three neighbors are alive.
+	\item dead cells come to life if exactly three neighbors are alive.
+	\item all other cells die.
+\end{enumerate}
+
+\section{Files and Pseudocode}\label{ss:files}
+\begin{enumerate}
+	\item universe.c
+	\begin{enumerate}
+		\item creates the 2D universe that the game will be played in. Contains functions:
+		\item uvcreate(rows, cols, toroidal) - creates the universe grid. Use calloc to initialize the array to 0's. if the boolean toroidal is true then return a pointer to Universe *. 
+		\item uvdelete(Universe *u) gets rid of the created universe that is passed into the function as a parameter. Use free() here to avoid memory leaks
+		\item uvrows(Universe *u) returns number of rows inside of the universe.
+		\item uvcols(Universe *u) return the number of columns in the specified universe
+		\item uvlivecell(Universe *u, uint32 r, uint32 c) sets the cell at row r and column c to live. use booleans to mark live and dead cells, true is live, false is dead. if the row and column don't exist in the universe given, then don't change anything.
+		\item uvdeadcell(Universe *u, uint32 r, uint32 c) sets the cell at row r and column c to dead. Use false to mark the cell as dead. Do nothing is r and c don't exist in the Universe.
+		\item uvgetcell(Universe *u, uint32 r, uint32 c) returns the boolean value at row r and column c. Return false if r and c don't exist.
+		\item ucpopulate(Universe *u, FILE *infile) creates universe using the given infile. Line 1 of the file should be the number of rows and columns separated with whitespace. Every other line in the file is the row and column of the live cells in the universe for that file. fscanf() reads row-column pairs for use in the universe.
+		\item uvcensus(Universe *u, uint32 r, uint32 c) returns number of adjacent live cells to the one given at row r and column c. If toroidal is set to true, then also consider the other side of the universe grid as adjacent if the live cell is at the edge of the universe. Otherwise do not consider this option.
+		\item uvprint(Universe *u, FILE *outfile) prints the universe with the live cells being 'o' and the dead cells being '.'. Use fputc() or fprintf to specify the outfile as the place to print the universe.
+	\end{enumerate}
+	\item universe.h
+	\begin{enumerate}
+		\item header file for universe.c that is going to be included in the file containing the main() function.
+	\end{enumerate}
+	\item life.c
+	\begin{enumerate}
+		\item contains main() function and runs the game of life simulation code using universe.h.
+	\end{enumerate}
+	\item Makefile
+	\begin{enumerate}
+		\item use CC = clang, CFLAGS = Wall, Wextra, Wpedantic, Werror
+		\item make, make life, make all must make the life executable file
+		\item make clean removes the files that the compiler generates
+		\item make format formats all c and h files
+	\end{enumerate}
+	\item README.md
+	\begin{enumerate}
+		\item describes how to use the program, run the program, and compile the program. Also includes errors in the code.
+	\end{enumerate}
+	\item DESIGN.pdf
+	\begin{enumerate}
+		\item describes the design process, and how to make the desired functions.
+	\end{enumerate}
+\end{enumerate}
+\end{document}
