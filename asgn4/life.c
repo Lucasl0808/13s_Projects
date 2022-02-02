@@ -9,7 +9,9 @@
 
 #define DELAY 50000
 
-void update(Universe *u, Universe *r) { // takes universe u and r as parameters. Updates universe r using Conway's game of life rules
+void update(Universe *u,
+    Universe *
+        r) { // takes universe u and r as parameters. Updates universe r using Conway's game of life rules
     for (uint32_t i = 0; i < uv_rows(u); i += 1) {
         for (uint32_t j = 0; j < uv_cols(u); j += 1) {
             uint32_t count = uv_census(u, i, j);
@@ -84,7 +86,7 @@ int main(int argc, char **argv) {
         curs_set(FALSE);
         for (uint32_t x = 0; x < generations; x += 1) {
             clear();
-            if ((int) x % 2 == 0) {// Print moving o for even numbered generations
+            if ((int) x % 2 == 0) { // Print moving o for even numbered generations
                 for (uint32_t row = 0; row < uv_rows(A); row += 1) {
                     for (uint32_t col = 0; col < uv_cols(A); col += 1) {
                         if (uv_get_cell(A, row, col)) {
@@ -93,7 +95,7 @@ int main(int argc, char **argv) {
                     }
                 }
             }
-            if ((int) x % 2 == 1) {// Print moving o for odd numbered generations
+            if ((int) x % 2 == 1) { // Print moving o for odd numbered generations
                 for (uint32_t row = 0; row < uv_rows(A); row += 1) {
                     for (uint32_t col = 0; col < uv_cols(A); col += 1) {
                         if (uv_get_cell(B, row, col)) {
