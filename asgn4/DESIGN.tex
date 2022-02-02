@@ -18,15 +18,68 @@ In this program we will make a game of life. The game uses a 2x2 grid as an ADT,
 	\begin{enumerate}
 		\item creates the 2D universe that the game will be played in. Contains functions:
 		\item uvcreate(rows, cols, toroidal) - creates the universe grid. Use calloc to initialize the array to 0's. if the boolean toroidal is true then return a pointer to Universe *. 
+			\begin{enumerate}
+			\item set struct rows, cols, toroidal to parameter rows, cols, and toroidal
+			\item set struct of grid to calloc using booleans and parameter rows
+			\item for loop to allocate memory for struct grid at each index in the rows, (allocate memory for 2x2 matrix)
+			\item return struct
+			\end{enumerate}
 		\item uvdelete(Universe *u) gets rid of the created universe that is passed into the function as a parameter. Use free() here to avoid memory leaks
+			\begin{enumerate}
+			\item for loop that frees memory as it was allocated in uvcreate()
+			\item free grid memory
+			\item free struct memory
+			\end{enumerate}
 		\item uvrows(Universe *u) returns number of rows inside of the universe.
-		\item uvcols(Universe *u) return the number of columns in the specified universe
+		\item uvcols(Universe *u) return the number of columns in the specified universe.
 		\item uvlivecell(Universe *u, uint32 r, uint32 c) sets the cell at row r and column c to live. use booleans to mark live and dead cells, true is live, false is dead. if the row and column don't exist in the universe given, then don't change anything.
+			\begin{enumerate}
+			\item check if given r and c are valid
+			\item if not return nothing
+			\item otherwise set grid value at row r and col c to true (true = alive)
+			\end{enumerate}
 		\item uvdeadcell(Universe *u, uint32 r, uint32 c) sets the cell at row r and column c to dead. Use false to mark the cell as dead. Do nothing is r and c don't exist in the Universe.
+			\begin{enumerate}
+			\item check if given r and c are valid
+			\item if not return nothing
+			\item otherwise set grid value at row r and col c to false (false = dead)
+			\end{enumerate}
 		\item uvgetcell(Universe *u, uint32 r, uint32 c) returns the boolean value at row r and column c. Return false if r and c don't exist.
+			\begin{enumerate}
+			\item check if cell is valid
+			\item if not return false
+			\item if it is valid then return the boolean from grid at row r and col c
+			\end{enumerate}
 		\item ucpopulate(Universe *u, FILE *infile) creates universe using the given infile. Line 1 of the file should be the number of rows and columns separated with whitespace. Every other line in the file is the row and column of the live cells in the universe for that file. fscanf() reads row-column pairs for use in the universe.
+			\begin{enumerate}
+			\item assume the infile is already open and you can start on the next line of the file
+			\item from the infile, scan every line until the end of the file (scan returns -1 at file end)
+			\item check each line as they are scanned in to make sure that they are valid points
+			\item if it is a valid point, then mark it as a live cell
+			\item close file and return true to signify that it successfully populated using the infile
+			\end{enumerate}
 		\item uvcensus(Universe *u, uint32 r, uint32 c) returns number of adjacent live cells to the one given at row r and column c. If toroidal is set to true, then also consider the other side of the universe grid as adjacent if the live cell is at the edge of the universe. Otherwise do not consider this option.
+			\begin{enumerate}
+			\item initialize a counter for the census
+			\item if it is not toroidal:
+				\begin{enumerate}
+				\item check each box around the given r and c if it is a valid box
+				\item this will require a bunch of if statements to check the grid boolean value and the cell validity
+				\end{enumerate}
+			\item if it is toroidal:
+				\begin{enumerate}
+				\item make new variables to keep track of the above row, below row, left column, right column
+				\item add total rows and cols += 1 depending on which row or col you are looking for(ex. if current row is 0, below row is 1 and above row is the last row)
+				\item list of if statements to check each grid position's value
+				\item each of these increment counter and after all if statments, counter is returned
+				\end{enumerate}
 		\item uvprint(Universe *u, FILE *outfile) prints the universe with the live cells being 'o' and the dead cells being '.'. Use fputc() or fprintf to specify the outfile as the place to print the universe.
+			\begin{enumerate}
+			\item for each row and column (nested loop):
+			\item if cell at current row and col = true then print o to outfile.
+			\item if cell at current row and col = false then print . to outfile.
+			\end{enumerate}
+		\end{enumerate}
 	\end{enumerate}
 	\item universe.h
 	\begin{enumerate}
@@ -34,7 +87,60 @@ In this program we will make a game of life. The game uses a 2x2 grid as an ADT,
 	\end{enumerate}
 	\item life.c
 	\begin{enumerate}
+		\item helper function update() that takes two universes for parameters:
+			\begin{enumerate}
+			\item loop through the first universe given and change the other universe based off the first universe 
+				\begin{enumerate}
+				\item if current cell is alive
+				\item if census is not 2 or 3 then mark current cell as dead
+				\item otherwise the cell is alive
+				\end{enumerate}
+				\begin{enumerate}
+				\item if cell is dead
+				\item if census is 3 mark current cell as alive
+				\item otherwise mark cell as dead
+				\end{enumerate}
+			\end{enumerate}
+		\item helper function swap() that swaps the two working universes
+			\begin{enumerate}
+			\item pass in both universes
+			\item set a temp universe equal to universe 1
+			\item universe 1 = universe 2
+			\item universe 2 = temp universe(1)
+			\end{enumerate}
 		\item contains main() function and runs the game of life simulation code using universe.h.
+			\begin{enumerate}
+			\item set variables equal to default values for command line inputs
+			\item while loop to parse command line options
+			\item change default values of each command line input inside each case
+			\item default output is help screen
+			\item scan the first line in the infile
+			\item create 2 universes using the first line values and the toroidal value
+			\item base case for if generations is 0 = print universe A, delete both universes, return
+			\item is ncurses is not silenced:
+				\begin{enumerate}
+				\item initialize screen and set cursor to false
+				\item loop for each generation
+				\item clear screen
+				\item if current iteration of loop is even, print universe A's display
+				\item if current iteration of loop is odd, print universe B's display
+				\item  refresh screen and sleep
+				\item if current iteration of loop is even, update Universe B
+				\item if current iteration of loop is odd, update Universe A
+				\item swap the two universes
+				\item outside generation loop, end ncurses and if generations is even, print A to outfile, if it is odd then print B to outfile
+				\item delete both universes and return
+				\end{enumerate}
+			\item if ncurses is silenced:
+				\begin{enumerate}
+				\item for loop from 0 to generations
+				\item if current iteration of loop is even, update B and swap universes
+				\item if current iteration of loop is odd, update A and swap universes
+				\item outside loop, if generations is even, print A to outfile
+				\item if generations is odd, print B to outfile
+				\item delete both universes and return
+				\end{enumerate}
+			\end{enumerate}
 	\end{enumerate}
 	\item Makefile
 	\begin{enumerate}
@@ -42,6 +148,7 @@ In this program we will make a game of life. The game uses a 2x2 grid as an ADT,
 		\item make, make life, make all must make the life executable file
 		\item make clean removes the files that the compiler generates
 		\item make format formats all c and h files
+		\item (to make life with ncurses we will need to link -lncurses at the end of compile)
 	\end{enumerate}
 	\item README.md
 	\begin{enumerate}
