@@ -175,41 +175,30 @@ void rsa_make_pub(mpz_t p, mpz_t q, mpz_t n, mpz_t e, uint64_t nbits, uint64_t i
 	mpz_t lcm, gcd_pq, abs_pq, pq, p_1, q_1, gcd_e;
 	mpz_inits(lcm, gcd_pq, abs_pq, pq, p_1, q_1, gcd_e, NULL);
 
-	printf("pbits = %" PRIu64"\n", pbits);
-	printf("qbits = %" PRIu64"\n", qbits);
-
 	make_prime(p, pbits, iters);	//p = prime number with p bits and iters iters
 	make_prime(q, qbits, iters);	//q = prime number with remaining bits and iters iters
 
-	gmp_printf("p = %Zd, q = %Zd, n = %Zd\n",p, q,n);
 	mpz_mul(n, q, p);	//n = p * q
-	gmp_printf("n = %Zd, p1 = %Zd, q1 = %Zd\n", n,p_1,q_1);
 	//lcm = abs(p-1*q-1) / gcd(p-1,q-1)
 	
 	mpz_sub_ui(p_1, p, 1);	//p_1 = p-1
 	mpz_sub_ui(q_1, q, 1);	//q_1 = q-1
-	gmp_printf("p1 = %Zd, q1 = %Zd\n", p_1, q_1);
 	mpz_mul(pq, p_1, q_1);	//pq = p-1 * q-1
 	mpz_abs(abs_pq, pq);	//abs_pq = abs(pq)
-	gmp_printf("pq = %Zd, abs = %Zd\n", pq, abs_pq);
 	gcd(gcd_pq, p_1, q_1);	//gcd_pq = gcd(p-1, q-1)
 	mpz_fdiv_q(lcm, abs_pq, gcd_pq);	//lcm = abs_pq/gcd_pq
-	gmp_printf("gcd = %Zd, lcm = %Zd\n", gcd_pq, lcm);
 	printf("nbits = %" PRIu64"\n", nbits);
 	mpz_urandomb(e, state, nbits);	//initialize e to be random number from 0- nbits length
 	mpz_add_ui(e, e, 5);
 	gcd(gcd_e, e, lcm);	//gcd_e = gcd(e, lcm)
-	gmp_printf("gcde = %Zd, e= %Zd\n", gcd_e, e);
 	while(mpz_cmp_ui(gcd_e, 1) != 0){	// if gcd(e, lcm) is not 1 (not coprime)
 
 		mpz_urandomb(e, state, nbits);	//e = random from 0 - nbits length
-		//gmp_printf("e = %Zd\n",e);
 		gcd(gcd_e, e, lcm);	//gcd_e = gcd(e, lcm) 
 		
 		//loop breaks if e coprime with lcm, and e will equal the suitable number
 	}
 	mpz_clears(lcm, gcd_pq, abs_pq, pq, p_1, q_1, gcd_e,NULL);
-	//FIX CODE GENERATING SUITABLE E TAKES FOREVER
 }
 
 int main(void){
