@@ -19,14 +19,19 @@ void randstate_clear(void){
 }
 
 void gcd(mpz_t d, mpz_t a, mpz_t b){
-	while(mpz_cmp_ui(b, 0) != 0){ //while b != 0
+	mpz_t temp_a, temp_b;
+	mpz_inits(temp_a, temp_b, NULL);
+	mpz_set(temp_a, a);	//temp a = a
+	mpz_set(temp_b, b);	//temp b = b
+	while(mpz_cmp_ui(temp_b, 0) != 0){ //while b != 0
 		mpz_t t;
-		mpz_init_set(t, b);	//t = b
-		mpz_mod(b, a, b);	//b = a % b
-		mpz_set(a, t);		//a = t
+		mpz_init_set(t, temp_b);	//t = b
+		mpz_mod(temp_b, temp_a, temp_b);	//b = a % b
+		mpz_set(temp_a, t);		//a = t
 		mpz_clear(t);
 	}
-	mpz_set(d, a);	//d = a
+	mpz_set(d, temp_a);	//d = a
+	mpz_clears(temp_a, temp_b, NULL);
 }
 
 void pow_mod(mpz_t out, mpz_t base, mpz_t exponent, mpz_t modulus){
@@ -192,8 +197,8 @@ void rsa_make_pub(mpz_t p, mpz_t q, mpz_t n, mpz_t e, uint64_t nbits, uint64_t i
 	gmp_printf("gcd = %Zd, lcm = %Zd\n", gcd_pq, lcm);
 	printf("nbits = %" PRIu64"\n", nbits);
 	mpz_urandomb(e, state, nbits);	//initialize e to be random number from 0- nbits length
+	mpz_add_ui(e, e, 5);
 	gcd(gcd_e, e, lcm);	//gcd_e = gcd(e, lcm)
-	mpz_urandomb(e, state, nbits);
 	gmp_printf("gcde = %Zd, e= %Zd\n", gcd_e, e);
 	while(mpz_cmp_ui(gcd_e, 1) != 0){	// if gcd(e, lcm) is not 1 (not coprime)
 
