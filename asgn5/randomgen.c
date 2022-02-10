@@ -201,7 +201,76 @@ void rsa_make_pub(mpz_t p, mpz_t q, mpz_t n, mpz_t e, uint64_t nbits, uint64_t i
 	mpz_clears(lcm, gcd_pq, abs_pq, pq, p_1, q_1, gcd_e,NULL);
 }
 
+//make read pub
+
+void rsa_write_pub(mpz_t n, mpz_t e, mpz_t s, char username[], FILE *pbfile){
+	//assume pbfile is open for writing
+	gmp_fprintf(pbfile, "%Zx\n", n);
+	gmp_fprintf(pbfile, "%Zx\n", e);
+	gmp_fprintf(pbfile, "%Zx\n", s);
+	gmp_fprintf(pbfile, "%s\n", username);
+}
+
+void rsa_make_priv(mpz_t d, mpz_t e, mpz_t p, mpz_t q){
+	//d = mod inverse(e, lcm)
+	mpz_t p_1, q_1,pq, abs_pq, gcd_pq, lcm;
+	mpz_inits(p_1, q_1, pq, abs_pq, gcd_pq, lcm, NULL);
+	mpz_sub_ui(p_1, p, 1);  //p_1 = p-1
+	mpz_sub_ui(q_1, q, 1);  //q_1 = q-1
+	mpz_mul(pq, p_1, q_1);  //pq = p-1 * q-1
+	mpz_abs(abs_pq, pq);    //abs_pq = abs(pq)
+	gcd(gcd_pq, p_1, q_1);  //gcd_pq = gcd(p-1, q-1)
+	mpz_fdiv_q(lcm, abs_pq, gcd_pq);	//lcm = abs(p-1 * q-1) / gcd(p-1,q-1)
+	mod_inverse(d, e, lcm);	//d = mod_inverse(e, lcm)
+	mpz_clears(p_1, q_1, pq, abs_pq, gcd_pq, lcm, NULL);
+}
+
+void rsa_write_priv(mpz_t n, mpz_t d, FILE *pvfile){
+	//assume pv file is open for writing
+	//d = priv key
+	//n = p * q
+	gmp_fprintf(pvfile, "%Zx\n", n);
+	gmp_fprintf(pvfile, "%Zx\n", d);
+	fclose(pvfile);
+}
+
+//make read private
+
+void rsa_encrypt(mpz_t c, mpz_t m, mpz_t e, mpz_t n){
+	//encrypt using powermod c = powermod(m, e, n)
+	power_mod(c, m, e, n);
+}
+
+void rsa_decrypt(mpz_t m, mpz_t c, mpz_t d, mpz_t n){
+	//decrypt using power mod m = powermod(c, d, n)
+	power_mod(m, c, d, n);
+}
+
+void rsa_sign(mpz_t s, mpz_t m, mpz_t d, mpz_t n){
+	//s = m ^ d (mod n) = power mod
+	power_mod(s, m, d, n);	//s = power mod(m = base, d = exponent, n = modulus)
+}
+
+bool rsa_verify(mpz_t m, mpz_t s, mpz_t e, mpz_t n){
+	//return true if temp t = m
+	//t = power mod(s, e, n)
+	mpz_t t;
+	mpz_init(t);
+	power_mod(t, s, e, n);	//t = power mod (s, e, n)
+	if(mpz_cmp(t, m) == 0){	// if t == m
+		mpz_clear(t);
+		return true;
+	}
+	else{
+		mpz_clear(t);i
+		return false;
+	}
+}
+
+//MAKE ENCRYPT/DECRYPT FILE FUNCTIONS
+
 int main(void){
+	
 	randstate_init(123456);
 	//gmp_randstate_t state;
 	//gmp_randinit_mt(state);
@@ -223,12 +292,14 @@ int main(void){
 	//gmp_printf("gcd = %Zd\n",x);
 	//printf("z is prime = %d\n", is_prime(z, 50));
 	
-	mpz_t p,q,n,e;
-	mpz_inits(p,q,n,e,NULL);
+	mpz_t p,q,n,e, x;
+	mpz_inits(p,q,n,e,x,NULL);
 	rsa_make_pub(p,q,n,e,52, 50);
 	gmp_printf("q = %Zd, p = %Zd, n = %Zd, e = %Zd\n", q, p, n, e);
+	rsa_make_priv(x, e, p, q);
+	gmp_printf("priv = %Zd\n", x);
 	randstate_clear();
-	mpz_clears(q,p,n,e,NULL);
+	mpz_clears(q,p,n,e,x,NULL);
 	
 
 	//randstate_clear();
