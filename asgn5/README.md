@@ -4,16 +4,16 @@ Assignment involves making public and private keys using large prime numbers and
 
 ## Compile/build
 
-make all = creates keygen, encrypt, and decrypt executables
-make keygen = only creates keygen executable
-make encrypt = only creates encrypt executable
-make decrypt = only creates decrypt executable
-make clean = removes executables and object files
+make all = creates keygen, encrypt, and decrypt executables<br>
+make keygen = only creates keygen executable<br>
+make encrypt = only creates encrypt executable<br>
+make decrypt = only creates decrypt executable<br>
+make clean = removes executables and object files<br>
 
 ## Running code
 
-run command: ./keygen -h for more info on running the keygen file
-run command: ./encrypt -h for more info on running the encrypt file
-run command: ./decrypt -h for more info on running the decrypt file
+run command: ./keygen -h for more info on running the keygen file<br>
+run command: ./encrypt -h for more info on running the encrypt file<br>
+run command: ./decrypt -h for more info on running the decrypt file<br>
 
 
