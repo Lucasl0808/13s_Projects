@@ -1,0 +1,301 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn6 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{2/18/2022}
+\begin{document}\maketitle
+\section{Program Details}\label{ss:details}
+Program implements Huffman Encoder and Decoder, as well as structures for stacks and queues.
+\section{Huffman Encoder}\label{ss:encoder}
+encode():
+\begin{enumerate}
+\item -h prints out a help message
+\item -i (infile) sets the file that is to be encoded. Default is stdin
+\item -o (outfile) sets the file to be encoded to. Default is stdout
+\item -v prints uncompressed file size, compressed file size, and space saving to stderr
+\end{enumerate}
+To Huffman encode the file:
+\begin{enumerate}
+\item count the number of each unique symbol in the file (most likely use a struct)
+\item use priority queue to make a Huffman tree
+\item use stack of bits to traverse Huffman tree. Make a code table to index each symbol 
+\item encode the Huffman tree to the file using post-order traversal
+\item for each symbol in the input file, write the corresponding code to output
+\end{enumerate}
+decode():
+\begin{enumerate}
+\item -h prints help message
+\item -i (infile) specifies the file to decode. Default is stdin
+\item -o (outfile) specifies the file to decode to. Default is stdout
+\item -v prints compressed file size, decompressed file size, space saving.
+\end{enumerate}
+Algorithm steps for decoding:
+\begin{enumerate}
+\item read Huffman tree from the input file.
+\item use a stack of nodes to reconstruct Huffman tree
+\item read each bit of the input file, reading a 0 when going down a left link (lower value) and reading a 1 when going down the right link (higher value)
+\item when reaching an end node, emit the symbol and start traversing the tree again from the beginning and not going the same path
+\end{enumerate}
+\section{Nodes}\label{ss:Nodes}
+We will make an ADT for nodes which will act as linked lists needed for Huffman trees.
+\begin{enumerate}
+\item make Node struct that has pointers to left and right Nodes, as well as variables to record the symbol and frequency of the variable
+\end{enumerate}
+We will use the following functions in creating the Nodes:
+\begin{enumerate}
+\item NodeCreate(uint8  symbol, uint64 freq)
+	\begin{enumerate}
+	\item constructs node. Allocates space and initializes the variables to the values in the parameters
+	\end{enumerate}
+\item NodeDelete(Node N)
+	\begin{enumerate}
+	\item deletes Node struct N. Free memory allocated when creating node. 
+	\end{enumerate}
+\item NodeJoin(Node left, Node right)
+	\begin{enumerate}
+	\item creates a new node that returns a Node with the left and right value combined.
+	\item frequency will be the sum of left and right frequency
+	\item symbol will be \textdollar
+	\end{enumerate}
+\item NodePrint(Node n)
+	\begin{enumerate}
+	\item print node n for debugging purposes.
+	\end{enumerate}
+\end{enumerate}
+\section{Priority Queue}\label{ss:Prio}
+We will also need to implement a priority queue struct for the enqueue.
+\begin{enumerate}
+\item pqCreate(uint32 capacity)
+	\begin{enumerate}
+	\item constructs a priority queue making the max capacity specified in the parameter
+	\item malloc using capacity
+	\end{enumerate}
+\item pqDelete(PriorityQueue q)
+	\begin{enumerate}
+	\item destroys Priority Queue q.
+	\item set pointer to NULL after freeing the memory from q
+	\end{enumerate}
+\item bool pqEmpty(PriorityQueue q)
+	\begin{enumerate}
+	\item return true for empty q, false otherwise
+	\end{enumerate}
+\item bool pqFull(PriorityQueue q)
+	\begin{enumerate}
+	\item return true if full q, false otherwise
+	\end{enumerate}
+\item uint32 pqSize(PriorityQueue q)
+	\begin{enumerate}
+	\item variable to keep track of size of q
+	\item for each index in q, index size variable
+	\item return the size
+	\end{enumerate}
+\item bool enqueue(PriorityQueue q, Node n)
+	\begin{enumerate}
+	\item put node into priority queue, return false if priority queue is full beforehand, and true if successfully enqueued
+	\end{enumerate}
+\item bool dequeue(PriorityQueue q, Node n)
+	\begin{enumerate}
+	\item dequeue node n from q, pass it back with a double pointer.
+	\item return false if priority queue is empty and true if successfully dequeued
+	\end{enumerate}
+\item pqPrint(PriorityQueue q)
+	\begin{enumerate}
+	\item for each element in q, print it out for testing purposes
+	\item this function acts as a debug function
+	\end{enumerate}
+\end{enumerate}
+\section{Huffman Codes}\label{ss:codes}
+We will create a Code struct:
+\begin{enumerate}
+\item Code codeInit()
+	\begin{enumerate}
+	\item initialize code by setting variable top to 0 and zeroing out bits
+	\end{enumerate}
+\item uint32 codeSize(Code c)
+	\begin{enumerate}
+	\item return size of code. This is the number of bits pushed to Code c
+	\end{enumerate}
+\item bool codeEmpty(Code c)
+	\begin{enumerate}
+	\item return true if Code c is empty, false otherwise
+	\end{enumerate}
+\item bool codeFull(Code c)
+	\begin{enumerate}
+	\item return true if Code c is full, false otherwise
+	\end{enumerate}
+\item bool codeSetBit(Code c, uint32 i)
+	\begin{enumerate}
+	\item set Code c at index i to 1. If i is out of range return false. Return true if successful
+	\end{enumerate}
+\item bool codeClrBit(Code c, uint32 i)
+	\begin{enumerate}
+	\item clear Code c at index i by setting it to 0. If i is out of range return false. Return true if successful otherwise
+	\end{enumerate}
+\item bool codeGetBit(Code c, uint32 i)
+	\begin{enumerate}
+	\item get bit in Code c at index i. If i is out of range or index i is equal to 0 return false. Return true only if index i is equal to 1
+	\end{enumerate}
+\item bool codePushBit(Code c, uint8 bit)
+	\begin{enumerate}
+	\item push bit to Code c
+	\item return false if Code is full before pushing bit
+	\item return true if bit is successfully pushed
+	\end{enumerate}
+\item bool codePopBit(Code c, uint8 bit)
+	\begin{enumerate}
+	\item pop bit from Code c by passing the value back into pointer bit.
+	\item return false if Code c is empty, and true if bit is successfully popped
+	\end{enumerate}
+\item codePrint(Code c)
+	\begin{enumerate}
+	\item debug function that prints out elements in c
+	\item used to determine if push and pop are successful or not
+	\end{enumerate}
+\end{enumerate}
+
+\section{I/O}\label{ss:IO}
+We will need to make an IO file for reading and writing bytes
+\begin{enumerate}
+\item int readBytes(int infile, uint8 buf, int nbytes)
+	\begin{enumerate}
+	\item infile parameter is the number of bytes read from the file descriptor
+	\item loops calls to read() until nbytes are read from the file descriptor or there are no more bytes in the file to read (eof)
+	\end{enumerate}
+\item int writeBytes(int outfile, uint8 buf, int nbytes)
+	\begin{enumerate}
+	\item loop calls to write()
+	\item loop until nbytes are written, all bytes of buf are written, or no bytes are written
+	\end{enumerate}
+\item bool readBit(int infile, uint8 bit)
+	\begin{enumerate}
+	\item read bytes into a buffer and read each bit from it one at a time
+	\item create a buffer of bytes to track which bit to return to the bit pointer.
+	\item buffer stores BLOCK number of bytes and returns false if there are no bits that can be read. Returns true if there are still bits to read.
+	\end{enumerate}
+\item writeCode(int outfile, Code c)
+	\begin{enumerate}
+	\item use bit buffer similar to readBit.
+	\item write each bit in Code c to buffer starting from 0th bit
+	\item when buffer has BLOCK bytes, write buffer contents to outfile
+	\end{enumerate}
+\item flushCodes(int outfile)
+	\begin{enumerate}
+	\item this function makes sure that there are no bits leftover after writeCode is called, so this writes out any left out bits in the buffer
+	\end{enumerate}
+\end{enumerate}
+\section{Stacks}\label{ss:stacks}
+We need to make a stack of nodes to reconstruct the Huffman tree
+\begin{enumerate}
+\item stackCreate(uint32 capacity)
+	\begin{enumerate}
+	\item constructor for stack that sets max nodes to capacity
+	\end{enumerate}
+\item stackDelete(Stack s)
+	\begin{enumerate}
+	\item destroys stack, sets pointer to NULL after freeing allocated memory from stack
+	\end{enumerate}
+\item bool stackEmpty(Stack s)
+	\begin{enumerate}
+	\item return true if s is empty, false if not
+	\end{enumerate}
+\item bool stackFull(Stack s)
+	\begin{enumerate}
+	\item return true if stack is full, false if not
+	\end{enumerate}
+\item uint32 stackSize(Stack s)
+	\begin{enumerate}
+	\item return number of nodes in s
+	\end{enumerate}
+\item bool stackPush(Stack s, Node n)
+	\begin{enumerate}
+	\item push n onto s. Return false if stack is full beforehand and true if push is successful
+	\end{enumerate}
+\item bool stackPop(Stack s, Node n)
+	\begin{enumerate}
+	\item pop n from s, and pass popped n back into double pointer n. Return false if stack was empty before pop and true if pop was successful
+	\end{enumerate}
+\item stackPrint(Stack s)
+	\begin{enumerate}
+	\item prints out the contents of s
+	\end{enumerate}
+\end{enumerate}
+\section{Huffman code module}\label{ss:module}
+\begin{enumerate}
+\item Node buildTree(uint64 hist(static ALPHABET))
+	\begin{enumerate}
+	\item builds node tree based on histogram given ALPHABET indices corresponding to different symbols
+	\item returns root node for the tree
+	\end{enumerate}
+\item buildCodes(Node root, Code table(static ALPHABET))
+	\begin{enumerate}
+	\item makes a code table for each symbol in the Huffman tree, copies the codes to table, which has ALPHABET indices for each symbol
+	\end{enumerate}
+\item dumpTree(int outfile, Node root)
+	\begin{enumerate}
+	\item writes to outfile L followed by byte of symbol for a leaf node and an I for interior nodes
+	\item do not write the symbol for interior nodes
+	\end{enumerate}
+\item Node rebuildTree(uint16 nbytes, uint8 treeDump(static nbytes))
+	\begin{enumerate}
+	\item reconstructs Huffman tree using treeDump
+	\item length of treeDump is nbytes. Returns root node of reconstructed tree
+	\end{enumerate}
+\item deleteTree(Node root)
+	\begin{enumerate}
+	\item deconstructs Huffman tree
+	\item post-order traversal to free each node in the tree
+	\item set pointer root to NULL after freeing each node
+	\end{enumerate}
+\end{enumerate}
+\section{File Encoder}\label{ss:encoder}
+Steps to implement the Huffman encoder
+\begin{enumerate}
+\item read infile to make a histogram using struct
+\item increment index 0 and 255 of histogram array to make sure that there are at least 2 elements
+\item buildTree() to make Huffman tree using histogram
+	\begin{enumerate}
+	\item make a priority queue and add each symbol that has a non 0 frequency to the queue and make a node of it
+	\item while there are two or more nodes in priority queue, dequeue two nodes, one left and one right
+	\item join these two dequeued nodes and queue the now created parent node
+	\item frequency of parent node = sum of children frequencies
+	\item when there is one node left in the queue, that is the root of the tree
+	\end{enumerate}
+\item make a code table by stepping through the Huffman tree created
+	\begin{enumerate}
+	\item create Code c using codeInit() starting at root of the tree
+	\item if current node is a leaf, c is the path to a node and has the node's symbol. Save the code to the table
+	\item if it is not a leaf, push 0 to Code c and go down the left link
+	\item once returning from the left, pop bits from c, push 1 to c and go down the right links
+	\item when returning from right, pop bit from c.
+	\end{enumerate}
+\item make a header supplied in header.h
+\item write header to outfile
+\item write Huffman tree to outfile using dumpTree
+\item write corresponding symbol code to outfile by reading infile
+\item flush remaining buffered bits using flushCodes
+\item close both files
+\end{enumerate}
+\section{Decoder specifics}\label{ss:decoder}
+\begin{enumerate}
+\item read header from infile and its magic number
+\item if magic number does not match MAGIC in defines.h, then quit program
+\item set outfile permissions using fchmod() with given permissions in the header
+\item read dumped tree from infile and reconstruct Huffman tree (rebuildTree())
+	\begin{enumerate}
+	\item treeDump = array containing dumped tree
+	\item treeDump length = nbytes
+	\item loop over contents from 0 to nbytes in treeDump
+	\item if element of array is L (leaf), then the next element of the array is its symbol. Create a node using that symbol and push it to the stack
+	\item if element of array is I (interior node), then pop the stack to get the right child of that node, and pop again to get the left child of the node.
+	\item join the two popped nodes and join them to create a parent node and push it to the stack
+	\item once there is one node left in treeDump, that is the root of the Huffman tree
+	\end{enumerate}
+\item read infile for each bit using readBit()
+	\begin{enumerate}
+	\item begin at root of the tree, if a 0 is read then go left of current node. If a 1 is read then go right of the current node
+	\item If a leaf node is encountered (next node is NULL) then write that symbol to outfile and reset the current node back to the root of the tree
+	\item repeat for each read bit and until the decoded symbols equal those of the original file size from the header
+	\end{enumerate}
+\item close infile and outfile
+\end{enumerate}
+
+\end{document}
