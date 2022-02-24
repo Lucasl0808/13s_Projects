@@ -55,7 +55,7 @@ bool read_bit(int infile, uint8_t *bit){
 	static uint8_t buffer[BLOCK];
 	if(count == 0 && index == 0){
 		read_bytes(infile, buffer, BLOCK);	//if we need to fill up the empty buffer, fill it with bytes from infile
-		printf("buffer = %" PRIu8 "\n", buffer[index]);
+		//printf("buffer = %" PRIu8 "\n", buffer[index]);
 	}
 	
 	//printf("buffer = %" PRIu8 "\n", buffer[index]);
@@ -75,7 +75,7 @@ bool read_bit(int infile, uint8_t *bit){
 		count = 0;
 	}
 
-	if(count == 8 && index == BLOCK){       //if we have reached the end of the buffer, reset index and count to the start
+	if(count == 0 && index == BLOCK){       //if we have reached the end of the buffer, reset index and count to the start
 		index = 0;
 		count = 0;
 		printf("reached end of buffer");
@@ -85,9 +85,45 @@ bool read_bit(int infile, uint8_t *bit){
 	return true;
 }
 
-//void write_code(int outfile, Code *c){
+static uint8_t write_buffer[BLOCK];
+static int write_index = 0;
+
+void write_code(int outfile, Code *c){
+	//for each bit in Code c, write it to the static buffer (outside function)
+	//write_bytes to outfile using static buffer once it is full
+	//otherwise fill up buffer by reading in code c
+	//code_get_bit(c, uint32_t i) where i is the bit number returns its value as a bool
+	//while code c is not 0, add rightmost bit to buffer 
 	
-//}
+	int index = 0;	//c->bit[index] = index in bit array
+	uint32_t bit_location = 0;	//bit_location = index to get bit in code
+	uint32_t exponent = 1;	//stores value to use as: 2^exponent (starts at 0)
+	uint32_t bits_written = 0;
+
+	while(bits_written != c->top){	//while number of bits written != c->top (c->top = bits pushed to code)
+		if(code_get_bit(c, bit_location)){	//if rightmost bit is 1 (true)
+			write_buffer[index] += exponent;	//add bit (2^exponent) to buffer[index]
+			bits_written += 1;
+		}
+		if(code_get_bit(c, bit_location) == false){	//if rightmost bit is 0 (false)
+			//dont write anything to buffer
+			bits_written += 1;
+		}
+		exponent *= 2;	//increase value of exponent by 1
+		bit_location += 1;	//get the bit in the next bit location
+		if(bit_location % 8 == 0){	//if bit location is  a multiple of 8 (goes into next index)
+			write_index += 1;	//start writing into the next index
+		}
+		if(index == BLOCK){	//if we finished writing to the last index in write_buffer
+			write_bytes(outfile, write_buffer, BLOCK);	//write BLOCK bytes of write_buffer to outfile
+			for(int x = 0; x < BLOCK; x += 1){
+				write_buffer[x] = 0;	//clear buffer after writing to outfile
+				write_index = 0; 	//reset index after clearing buffer to write to the beginning
+			}
+		}
+	}
+
+}
 
 int main(void){
 	int fd = open("test.txt", O_RDONLY);
@@ -97,6 +133,7 @@ int main(void){
 	//uint8_t a = 0;
 	//uint8_t b = 0;
 	//uint8_t c = 0;
+	
 	read_bit(fd, &l);
 	read_bit(fd, &l);
 	read_bit(fd, &l);
@@ -107,8 +144,20 @@ int main(void){
 	read_bit(fd, &l);
 	read_bit(fd, &l);
 	read_bit(fd, &l);
+	
+	/*
+	int count = 0;
+	while(read_bit(fd, &l)){
+		if(l == 1){
+			printf("%" PRIu8 "\n", l);
+		}
+		count += 1;
+	}
+	printf("%d\n", count);
+	*/
 	printf("l = %" PRIu8 "\n", l);
 	close(fd);
+
 	return 0;
 }
 
