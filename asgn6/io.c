@@ -95,34 +95,62 @@ void write_code(int outfile, Code *c){
 	//code_get_bit(c, uint32_t i) where i is the bit number returns its value as a bool
 	//while code c is not 0, add rightmost bit to buffer 
 	
-	int index = 0;	//c->bit[index] = index in bit array
-	uint32_t bit_location = 0;	//bit_location = index to get bit in code
+	//int index = 0;	//c->bit[index] = index in bit array
+	//uint32_t bit_location = 0;	//bit_location = index to get bit in code
+	
 	uint32_t exponent = 1;	//stores value to use as: 2^exponent (starts at 0)
 	uint32_t bits_written = 0;
 
-	while(bits_written != c->top){	//while number of bits written != c->top (c->top = bits pushed to code)
-		if(code_get_bit(c, bit_location)){	//if rightmost bit is 1 (true)
-			write_buffer[index] += exponent;	//add bit (2^exponent) to buffer[index]
+	while(bits_written != code_size(c)){	//while number of bits written != code size (bits pushed to code)
+		if(code_get_bit(c, write_index)){	//if rightmost bit is 1 (true)
+			write_buffer[write_index/8] += exponent;	//add bit (2^exponent) to buffer[index]
 			bits_written += 1;
+			//bits_in_buffer += 1;
 		}
-		if(code_get_bit(c, bit_location) == false){	//if rightmost bit is 0 (false)
+		if(code_get_bit(c, write_index) == false){	//if rightmost bit is 0 (false)
 			//dont write anything to buffer
 			bits_written += 1;
+			//bits_in_buffer += 1;
 		}
+
 		exponent *= 2;	//increase value of exponent by 1
-		bit_location += 1;	//get the bit in the next bit location
-		if(bit_location % 8 == 0){	//if bit location is  a multiple of 8 (goes into next index)
-			write_index += 1;	//start writing into the next index
+	
+		//bit_location += 1;	//get the bit in the next bit location
+		//if(bit_location % 8 == 0){	//if bit location is  a multiple of 8 (goes into next index)
+		//	write_index += 1;	//start writing into the next index
+		//}
+
+		write_index += 1;
+		if(write_index % 8 == 0){	//if index is 8 reset exponent value to 2^0
+			exponent = 1;
 		}
-		if(index == BLOCK){	//if we finished writing to the last index in write_buffer
+		if(write_index == (BLOCK * 8)){	//if we finished writing to the last index in write_buffer
 			write_bytes(outfile, write_buffer, BLOCK);	//write BLOCK bytes of write_buffer to outfile
 			for(int x = 0; x < BLOCK; x += 1){
 				write_buffer[x] = 0;	//clear buffer after writing to outfile
-				write_index = 0; 	//reset index after clearing buffer to write to the beginning
 			}
+			write_index = 0;
+			//bits_in_buffer = 0;	//reset count of bits in buffer by setting it to 0
 		}
 	}
 
+}
+
+void flush_codes(int outfile){
+	//write_index points to the index to where the write_buffer is 
+	//if buffer is empty dont write anything to outfile
+	//if there is something in the buffer write it to outfile
+	//set leftover bits in the last byte to 0 before writing it
+	if(write_index == 0){	//if there are no more bits in buffer
+		return;
+	}
+	else{
+		write_bytes(outfile, write_buffer, write_index/8);	//write_index(bits in index) / 8 = amount of bytes
+		for(int x = 0; x < write_index/8; x += ){
+			write_buffer[x] = 0;	//clear buffer after writing
+		}
+		write_index = 0;	//reset index after writing
+	}
 }
 
 int main(void){
