@@ -12,7 +12,7 @@ Node *build_tree(uint64_t hist[static ALPHABET]){
 
 	for(int i = 0; i < ALPHABET; i += 1){	//check each index of histogram
 		if(hist[i] > 0){	//if frequency of symbol is > 0
-			Node *n = node_create(char(i), hist[i]);	//make a node of symbol(ASCII) and freq
+			Node *n = node_create(i, hist[i]);	//make a node of symbol(ASCII) and freq
 			enqueue(q, n);	//enqueue node n into priority queue
 		}
 	}
@@ -32,20 +32,82 @@ Node *build_tree(uint64_t hist[static ALPHABET]){
 	return root;
 }
 
+Code c = code_init();	//initialize empty code
+
 void build_codes(Node *root, Code table[static ALPHABET]){
 	//table = array of codes, length 256 (ALPHABET)
-	
+	//run through the huffman tree and assign codes to each symbol(index in array)
+	//code is initialized before 
+	if(root != NULL){
+		if(root->left != NULL && root->right != NULL){
+			table[root->symbol] = c;	//table at index symbol = current code
+		}
+		else{
+			uint8_t temp = 0;
+			code_push_bit(&c, 0);
+			build_codes(root->left, table);
+			code_pop_bit(&c, &temp);
+
+			code_push_bit(&c, 1);
+			build_codes(root->right, table);
+			code_pop_bit(&c, &temp);
+		}
+	}
 }
 
 void dump_tree(int outfile, Node *root){
 	//post order traverse tree by writing L with symbol of leaf, or I for interior node
+	if(root != NULL){
+		dump_tree(outfile, root->left);
+		dump_tree(outfile, root->right);
+
+		if(root->left != NULL && root->right != NULL){	//writes leaf node to outfile
+			write(outfile, "L", 1);
+			write(outfile, root->symbol, 1); 
+		}
+		else{
+			write(outfile, "I", 1);	//writes Interior node to outfile without symbol
+		}
+	}
+
 }
 
 Node *rebuild_tree(uint16_t nbytes, uint8_t tree_dump[static nbytes]){
 	//construct huffman tree using dumped tree (dump_tree) stored in tree_dump
 	//return root of tree
+	//tree dump = array of Leaf and interior nodes with symbols
+	Stack *s = stack_create(nbytes);
+	for(uint16_t i = 0; i < nbytes; i += 1){
+		if(tree_dump[i] == 'L'){	//if current index of the tree dump is an L
+			Node *n = node_create(tree_dump[i+1], 0);	//create node with next index symbol and 0 freq
+			stack_push(s, n);	//push node to stack
+		}
+		if(tree_dump[i] == 'I'){	//if current index of tree dump is I
+			Node *l = NULL;
+			Node *r = NULL;
+			stack_pop(s, &r);	//pop stack to get right child - store it in r
+			stack_pop(s, &l);	//pop stack to get left child- store it in l
+			Node *p = node_join(l, r);	//parent = left joined with right
+			stack_push(s, p);	//push parent node onto stack
+		}
+	}
+	//after iterating through tree_dump there should be one node left in the stack
+	Node *root = NULL;
+	stack_pop(s, &root);
+	stack_delete(&s);
+	return root;	//pop last element in the stack to give us the root of the tree and then return it
+
+
 }
 
 void delete_tree(Node **root){
 	//destroy the huffman tree, use post order traversal to free all nodes and set root pointer to null after freeing
+	if(*root != NULL){
+		delete_tree(&(*root)->left);
+		delete_tree(&(*root)->right);
+
+		free(*root);
+		*root = NULL;
+	}
+
 }
