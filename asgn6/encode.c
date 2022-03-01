@@ -4,7 +4,10 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
+#include "header.h"
 #include "defines.h"
 #include "node.h"
 #include "io.h"
@@ -57,9 +60,68 @@ int main(int argc, char **argv){
 
 	//read through infile to fill up hist with data. Index of histogram = symbol
 	//maybe read into a buffer and read each index of that buffer
+	uint8_t buffer[BLOCK];
+	for(int i = 0; i < BLOCK; i += 1){
+		buffer[i] = 0;	//initialize empty buffer
+	}
+	
+
+	/*
+	int read = read_bytes(infile, &buffer, BLOCK);	//read in a BLOCK of bytes from infile and fill up buffer with values read
+
+	if(bytes_read == BLOCK){
+		for(int i = 0; i < BLOCK; i += 1){
+			hist[buffer[i]] += 1;
+			buffer[i] = 0;
+		}
+	}
+	*/
+	
+	//reads infile contents and creates histogram
+	int read = 0;
+	while((read = read_bytes(infile, buffer, BLOCK)) > 0){
+		for(int i = 0; i < read; i += 1){
+			hist[buffer[i]] += 1;
+		}
+	}
 
 	hist[0] += 1;
 	hist[255] += 1;	//increment end indices of hist
 
+	Node *root = build_tree(hist);
+
+	Code table[ALPHABET];
+
+	build_codes(root, table);	//build code table using huffman tree root and table
+
+	Header h;	//initialize header
+	h.magic = MAGIC;
+	
+	struct stat file_stat;
+
+	fstat(infile, &file_stat);
+
+	h.permissions = file_stat.st_mode;
+	fchmod(outfile, file_stat.st_mode);	//set permissions = to mode given by fstat
+
+	uint16_t count = 0;
+	for(int i = 0; i < ALPHABET; i += 1){	//get number of unique symbols in histogram
+		if(hist[i] > 0){
+			count += 1;
+		}
+	}
+	count *= 3;
+	count -= 1;	//calculations to get tree_size
+	h.tree_size = count;
+
+	h.file_size = file_stat.st_size;	//set file size = to size in bytes given by fstat
+
+	//figure out how to write header to outfile. Maybe write each of the individual aspects of header to outfile separately
+	write_bytes(outfile, &h, sizeof(h));	//writes header to outfile
+	
+	//dump tree using root node and outfile
+	dump_tree(outfile, root);
+
+	//START HERE AT 10.1.8 on ASSIGNMENT DOC
 
 }
