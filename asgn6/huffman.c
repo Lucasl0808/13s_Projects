@@ -1,3 +1,10 @@
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+
+#include "stack.h"
 #include "huffman.h"
 #include "pq.h"
 
@@ -9,17 +16,23 @@ Node *build_tree(uint64_t hist[static ALPHABET]){
 	
 	//capacity of priority queue = length of histogram
 	PriorityQueue *q = pq_create(ALPHABET);
+	//Node *n = NULL;
 
 	for(int i = 0; i < ALPHABET; i += 1){	//check each index of histogram
 		if(hist[i] > 0){	//if frequency of symbol is > 0
+			printf("i = %d\n", i);
 			Node *n = node_create(i, hist[i]);	//make a node of symbol(ASCII) and freq
+			printf("hist i = %"PRIu64 "\n", hist[i]);
+			node_print(n);
+			//pq_print(q);
 			enqueue(q, n);	//enqueue node n into priority queue
+			//node_delete(&n);
 		}
 	}
 	//queue is constructed and sorted with lowest freq in index 0
-	
+	pq_print(q);
 	while(pq_size(q) > 1){	//while there is more than 1 node priority queue (not root node)
-		Node *left == NULL;	//initialize left Node
+		Node *left = NULL;	//initialize left Node
 		Node *right = NULL;	//initialize right Node
 		dequeue(q, &left);
 		dequeue(q, &right);	//dequeue 2 nodes from q to get left and right nodes
@@ -28,18 +41,22 @@ Node *build_tree(uint64_t hist[static ALPHABET]){
 	}
 	Node *root = NULL;
 	dequeue(q, &root);	//store root node into root
-	pq_delete(q);	//q is empty so we can delete it
+	pq_delete(&q);	//q is empty so we can delete it
 	return root;
 }
 
-Code c = code_init();	//initialize empty code
+Code c = {0};//code_init();	//initialize empty code
+//c = code_init();
 
 void build_codes(Node *root, Code table[static ALPHABET]){
 	//table = array of codes, length 256 (ALPHABET)
 	//run through the huffman tree and assign codes to each symbol(index in array)
 	//code is initialized before 
+	//static Code c;
+	
+
 	if(root != NULL){
-		if(root->left != NULL && root->right != NULL){
+		if(root->left == NULL && root->right == NULL){
 			table[root->symbol] = c;	//table at index symbol = current code
 		}
 		else{
@@ -63,7 +80,7 @@ void dump_tree(int outfile, Node *root){
 
 		if(root->left != NULL && root->right != NULL){	//writes leaf node to outfile
 			write(outfile, "L", 1);
-			write(outfile, root->symbol, 1); 
+			write(outfile, &(root->symbol), 1); 
 		}
 		else{
 			write(outfile, "I", 1);	//writes Interior node to outfile without symbol

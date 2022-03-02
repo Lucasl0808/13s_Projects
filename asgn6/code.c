@@ -83,12 +83,12 @@ bool code_get_bit(Code *c, uint32_t i){
 	if(i > ALPHABET || i < 0){
 		return false;
 	}
-	uint32_t temp = 8;
+	//uint32_t temp = 8;
         uint32_t tempi = 0;
         uint32_t tempr = 0;
         uint8_t tempc = c->bits[i];     //temporary value holding number at c->bits[i]
-        tempi = i / temp;       //gets array location
-        tempr = i % temp;       //gets array position
+        tempi = i / 8;       //gets array location
+        tempr = i % 8;       //gets array position
 	tempc = c->bits[tempi] >> tempr;	//tempc shifts right by the position of the desired number. Puts desired bit at the 0th index
 	if(tempc % 2 == 1){	//if shifted number is odd (desired number is 1)
 		return true;
@@ -107,7 +107,7 @@ bool code_push_bit(Code *c, uint8_t bit){
 		c->top += 1;
 		return true;
 	}
-	if(bit == 1){	//if bit is 1 then set top bit to 1 and increment top by 1
+	if(bit > 0){	//if bit is anything above 0 then set top bit to 1 and increment top by 1
 		if(code_set_bit(c, c->top) == false){
 			return false;
 		}
@@ -143,12 +143,22 @@ bool code_pop_bit(Code *c, uint8_t *bit){
 
 
 void code_print(Code *c){
-	for(uint32_t i =0; i < MAX_CODE_SIZE; i += 1){
-		printf("%"PRIu8 " ", c->bits[i]);
+	
+	for(uint32_t i =0; i < c->top; i += 1){
+		if(code_get_bit(c, i) == false){
+			printf("0");
+		}
+		if(code_get_bit(c, i) == true){
+			printf("1");
+		}
+		//printf("%"PRIu8 " ", c->bits[i]);
 
 	}
+	
+
 	printf("top = %" PRIu32 "\n", c->top);
 }
+/*
 int main(void){
 	Code c = code_init();
 	//code_push_bit(&c, 1);
@@ -178,11 +188,25 @@ int main(void){
 	//}
 	
 	code_push_bit(&c, 1);
-	code_push_bit(&c, 0);
 	code_push_bit(&c, 1);
 	code_push_bit(&c, 1);
-	//code_push_bit(&c, 0);
-	//code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+	code_push_bit(&c, 1);
+
+	if(code_get_bit(&c, c.top-1)){
+		printf("index is true\n");
+	}
 
 	//code_push_bit(&c, 255);
 	code_print(&c);
@@ -199,3 +223,4 @@ int main(void){
 	code_print(&c);
 	return 1;
 }
+*/

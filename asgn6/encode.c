@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "huffman.h"
 #include "header.h"
 #include "defines.h"
 #include "node.h"
@@ -17,8 +18,8 @@
 int main(int argc, char **argv){
 	int opt = 0;
 	//open returns fd
-	int infile = open(STDIN_FILENO, O_RDONLY);	//default infile = stdin
-	int outfile = open(STDOUT_FILENO, O_RDWR | O_CREAT | O_TRUNC);	//default outfile = stdout
+	int infile = 0;//open(STDIN_FILENO, O_RDONLY);	//default infile = stdin
+	int outfile = 1;//open(STDOUT_FILENO, O_RDWR | O_CREAT | O_TRUNC);	//default outfile = stdout
 	bool verbose = false;
 	while((opt = (getopt(argc, argv, "hi:o:v"))) != -1){
 		switch(opt){
@@ -60,13 +61,14 @@ int main(int argc, char **argv){
 
 	//read through infile to fill up hist with data. Index of histogram = symbol
 	//maybe read into a buffer and read each index of that buffer
+	/*
 	uint8_t buffer[BLOCK];
 	for(int i = 0; i < BLOCK; i += 1){
 		buffer[i] = 0;	//initialize empty buffer
 	}
 	
 
-	/*
+	
 	int read = read_bytes(infile, &buffer, BLOCK);	//read in a BLOCK of bytes from infile and fill up buffer with values read
 
 	if(bytes_read == BLOCK){
@@ -75,25 +77,36 @@ int main(int argc, char **argv){
 			buffer[i] = 0;
 		}
 	}
-	*/
+	
 	
 	//reads infile contents and creates histogram
+	
 	int read = 0;
 	while((read = read_bytes(infile, buffer, BLOCK)) > 0){
 		for(int i = 0; i < read; i += 1){
 			hist[buffer[i]] += 1;
 		}
 	}
-
+	*/
 	hist[0] += 1;
 	hist[255] += 1;	//increment end indices of hist
+	
+	//for testing:
+	//hist[33] = 6;
+	//hist[80] = 9;
+	//hist[97] = 5;
 
 	Node *root = build_tree(hist);
+	//node_print(root);
 
 	Code table[ALPHABET];
 
 	build_codes(root, table);	//build code table using huffman tree root and table
 
+	printf("index 97 = \n");
+	//code_print(&table[97]);
+
+	
 	Header h;	//initialize header
 	h.magic = MAGIC;
 	
@@ -121,7 +134,7 @@ int main(int argc, char **argv){
 	
 	//dump tree using root node and outfile
 	dump_tree(outfile, root);
-
+	
 	//START HERE AT 10.1.8 on ASSIGNMENT DOC
 
 }

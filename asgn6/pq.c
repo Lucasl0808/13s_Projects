@@ -53,6 +53,24 @@ bool enqueue(PriorityQueue *q, Node *n){
 	if(pq_full(q)){
 		return false;
 	}
+	if(pq_empty(q)){
+		q->array[0] = n;	//insert node into array if it is empty
+		q->size += 1;
+		return true;
+	}
+	/*
+	uint32_t index = 0;
+	while(n->frequency >= q->array[index]->frequency){	//while node freq is >= q frequency
+		index += 1;	//move down array index to see what index to insert node into
+	}
+	q->size += 1;	//increase size to index rest of the array
+	for(uint32_t i = pq_size(q); i > index; i -= 1){
+		q->array[i] = q->array[i-1];	//move all elements past where Node n is inserted to the right by 1
+	}
+	q->array[index] = n;
+	
+	*/
+	
 	q->array[pq_size(q)] = n;	//insert Node n at the end of the array
 	q->size += 1;
 	
@@ -67,6 +85,7 @@ bool enqueue(PriorityQueue *q, Node *n){
 		}
 		q->array[j] = temp;
 	}
+	
 	return true;
 }
 
@@ -75,9 +94,12 @@ bool dequeue(PriorityQueue *q, Node **n){
 		return false;
 	}
 	*n = q->array[0];	//set n = highest prio array index
-	q->array[0] = NULL;
+	//q->array[0] = NULL;	//item pulled out is removed from array
 	for(uint32_t i = 1; i <= pq_size(q); i +=1){
-		q->array[i-1] = q->array[i];
+		q->array[i-1] = q->array[i];	//shift all items in array left by one index to set the next highest priority to array[0]
+		if(i == pq_size(q)){
+			q->array[i] = NULL;	//sets the last array spot to NULL indicating a empty slot because it moved left one spot
+		}
 	}
 	q->size -= 1;
 	return true;
@@ -90,14 +112,18 @@ void pq_print(PriorityQueue *q){
 
 	}
 }
-
+/*
 int main(void){
-	Node *z = node_create('^', 1);
+	Node *z = node_create('^', 100);
 	Node *a = node_create('!', 12);
 	Node *b = node_create('@', 10);
 	Node *c = node_create('#', 8);
-	Node *g = NULL;
-	PriorityQueue *q = pq_create(100);
+	Node *l = node_create('?', 19);
+	//Node *g = NULL;
+	PriorityQueue *q = pq_create(5);
+	if(pq_empty(q)){
+		printf("empty\n");
+	}
 	if(enqueue(q, z) == false){
 		return 1;
 	}
@@ -110,16 +136,25 @@ int main(void){
 	if(enqueue(q, c) == false){
 		return 1;
 	}
-	if(dequeue(q, &g) == false){
-		return 1;
+	//if(dequeue(q, &g) == false){
+	//	return 1;
+	//}
+	enqueue(q, l);
+	z = node_create('g', 2);
+	enqueue(q, z);
+	if(pq_full(q)){
+		printf("full queue\n");
 	}
-	node_print(g);
-	free(g);
-	//free(z);
-	free(a);
-	free(b);
-	free(c);
+
+	printf("%" PRIu32"\n", q->size);
+
+	node_print(z);
+//	free(g);
+	for(uint32_t i = 0; i <= pq_size(q); i +=1){
+		free(q->array[i]);
+	}
 	pq_print(q);
 	pq_delete(&q);
 	return 0;
 }
+*/
