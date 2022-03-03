@@ -141,8 +141,8 @@ int main(int argc, char **argv) {
     if (verbose == true) {
         fprintf(stderr, "uncompressed file size = %lu bytes\n", h.file_size);
         fprintf(stderr, "compressed file size = %lu bytes\n", outfile_stat.st_size);
-        int saving = 100 * (1 - (outfile_stat.st_size / h.file_size));
-        fprintf(stderr, "space saving = %d%%\n", saving);
+        double saving = 100 * (1 - ((double)outfile_stat.st_size / (double)h.file_size));
+        fprintf(stderr, "space saving = %.2f%%\n", saving);
     }
     delete_tree(&root);
     close(infile);
