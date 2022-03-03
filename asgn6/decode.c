@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "compressed file size = %lu bytes\n", infile_stat.st_size);
         fprintf(stderr, "decompressed file size = %lu bytes\n", outfile_stat.st_size);
         uint64_t saving = 100 * (1 - (infile_stat.st_size / outfile_stat.st_size));
-        fprintf(stderr, "space saving = %"PRIu64"%%\n", saving);
+        fprintf(stderr, "space saving = %" PRIu64 "%%\n", saving);
     }
 
     delete_tree(&root);
