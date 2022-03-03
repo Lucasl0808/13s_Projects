@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "huffman.h"
 #include "header.h"
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
             return 0;
         }
     }
+
     uint64_t hist[ALPHABET]; //create histogram of size 256(alphabet).
     for (int i = 0; i < ALPHABET; i += 1) {
         hist[i] = 0; //initialize all values of histogram to 0 before reading in infile
