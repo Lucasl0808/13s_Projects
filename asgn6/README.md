@@ -13,6 +13,7 @@ run command: ./decode -h for info on how to run the encoder<br>
 
 ## Issues/Errors to report
 If you call for a verbose output on the decoder without an outfile, it will cause an error and not print correctly.<br>
-Otherwise, giving the decoder an outfile will not cause this problem.
+Otherwise, giving the decoder an outfile will not cause this problem.<br>
+Also, when I tested the decoder, it takes a bit longer to decode extremely long files like bible.txt.
 
 
