@@ -4,7 +4,9 @@
 
 #include "node.h"
 #include "ht.h"
+#include "hti.h"
 #include "salts.h"
+#include "speck.h"
 
 struct HashTable{
 	uint64_t salt[2];
@@ -19,6 +21,30 @@ HashTable *ht_create(uint32_t size){
 	ht->salt[1] = SALT_HASHTABLE_HI;
 	ht->slots = (Node **)malloc(sizeof(Node *));
 	return ht;
+}
+
+void ht_delete(HashTable **ht){
+	for(uint32_t i = 0; i < ht_size(*ht); i +=1){
+		if((*ht)->slots[i] != NULL){
+			free((*ht)->slots[i]);	
+		}
+	}
+	//free all nodes in hash table slots
+	free(*ht);
+	*ht = NULL;
+
+}
+
+uint32_t ht_size(HashTable *ht){
+	return ht->size;
+}
+
+Node *ht_lookup(HashTable *ht, char *word){
+	int index = hash(ht->salt, word);	//hash the word to get index
+}
+
+Node *ht_insert(HashTable *ht, char *word){
+	
 }
 
 void ht_print(HashTable *ht){
