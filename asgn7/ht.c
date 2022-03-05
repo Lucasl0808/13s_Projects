@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <inttypes.h>
+
+#include "node.h"
+#include "ht.h"
+#include "salts.h"
+
+struct HashTable{
+	uint64_t salt[2];
+	uint32_t size;
+	Node **slots;
+};
+
+HashTable *ht_create(uint32_t size){
+	HashTable *ht = (HashTable *)malloc(sizeof(HashTable));
+	ht->size = size;
+	ht->salt[0] = SALT_HASHTABLE_LO;
+	ht->salt[1] = SALT_HASHTABLE_HI;
+	ht->slots = (Node **)malloc(sizeof(Node *));
+	return ht;
+}
+
+void ht_print(HashTable *ht){
+	printf("Size of Hashtable = %"PRIu32"\n", ht->size);
+	printf("Lower Salt = %"PRIu64"\n", ht->salt[0]);
+	printf("Upper Salt = %"PRIu64"\n", ht->salt[1]);
+	printf("HashTable:\n");
+	for(uint32_t i = 0; i < ht->size; i += 1){
+		printf("Index %"PRIu32" = %s, count = %"PRIu32"\n", i, ht->slots[i]->word, ht->slots[i]->count);
+	}
+}
+
+int main(void){
+	//Node *a = node_create("Hello");
+	//Node *b = node_create("World");
+	HashTable *ht = ht_create(2);
+	ht_print(ht);
+	return 0;
+}
