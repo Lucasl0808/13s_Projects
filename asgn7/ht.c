@@ -19,7 +19,7 @@ HashTable *ht_create(uint32_t size){
 	ht->size = size;
 	ht->salt[0] = SALT_HASHTABLE_LO;
 	ht->salt[1] = SALT_HASHTABLE_HI;
-	ht->slots = (Node **)malloc(sizeof(Node *));
+	ht->slots = (Node **)malloc(sizeof(Node *) * size);
 	return ht;
 }
 
@@ -40,11 +40,28 @@ uint32_t ht_size(HashTable *ht){
 }
 
 Node *ht_lookup(HashTable *ht, char *word){
-	int index = hash(ht->salt, word);	//hash the word to get index
+	int index = hash(ht->salt, word) % ht_size(ht);	//hash the word to get index and make sure that it is in the bounds of the hash table size
+	int count = 0;
+	while(count != ht_size(ht)){
+		if(ht->slots[index]->word == word){
+			return ht->slots[index]->word;
+		}
+		index += 1;
+		index = index % ht_size(ht);
+		count += 1;
+	}
+	return NULL;
 }
 
 Node *ht_insert(HashTable *ht, char *word){
-	
+	int index = hash(ht->salt, word) % ht_size(ht);
+	int count = 0;
+	while(count != ht_size(ht)){
+		if(ht->slots[index] == NULL){
+			ht->slots[index] = node_create(word, 1);
+
+		}
+	}
 }
 
 void ht_print(HashTable *ht){
