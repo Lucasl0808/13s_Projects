@@ -20,16 +20,20 @@ HashTable *ht_create(uint32_t size){
 	ht->salt[0] = SALT_HASHTABLE_LO;
 	ht->salt[1] = SALT_HASHTABLE_HI;
 	ht->slots = (Node **)malloc(sizeof(Node *) * size);
+	for(uint32_t i = 0; i < ht->size; i +=1){
+		ht->slots[i] = NULL;
+	}
 	return ht;
 }
 
 void ht_delete(HashTable **ht){
 	for(uint32_t i = 0; i < ht_size(*ht); i +=1){
 		if((*ht)->slots[i] != NULL){
-			free((*ht)->slots[i]);	
+			node_delete(&(*ht)->slots[i]);
 		}
 	}
 	//free all nodes in hash table slots
+	free((*ht)->slots);
 	free(*ht);
 	*ht = NULL;
 
@@ -93,10 +97,9 @@ void ht_print(HashTable *ht){
 	}
 }
 
-/*
+
 int main(void){
 	Node *a = NULL;
-	//Node *b = node_create("World");
 	HashTable *ht = ht_create(2);
 	ht_insert(ht, "Hello");
 	ht_insert(ht, "World");
@@ -104,6 +107,7 @@ int main(void){
 	a = ht_lookup(ht, "World");
 	node_print(a);
 	ht_print(ht);
+	ht_delete(&ht);
 	return 0;
 }
-*/
+
