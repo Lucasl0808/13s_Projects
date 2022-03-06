@@ -14,6 +14,11 @@ struct HashTable{
 	Node **slots;
 };
 
+struct HashTableIterator{
+	HashTable *table;
+	uint32_t slot;
+};
+
 HashTable *ht_create(uint32_t size){
 	HashTable *ht = (HashTable *)malloc(sizeof(HashTable));
 	ht->size = size;
@@ -24,6 +29,17 @@ HashTable *ht_create(uint32_t size){
 		ht->slots[i] = NULL;
 	}
 	return ht;
+}
+
+HashTableIterator *hti_create(HashTable *ht){
+	HashTableIterator *hti = (HashTableIterator *)malloc(sizeof(HashTableIterator));
+	hti->table = ht;
+	hti->slot = 0;	
+	return hti;
+}
+
+void hti_delete(HashTableIterator **hti){
+	free(*hti);
 }
 
 void ht_delete(HashTable **ht){
@@ -97,16 +113,41 @@ void ht_print(HashTable *ht){
 	}
 }
 
+Node *ht_iter(HashTableIterator *hti){
+	while(hti->slot != hti->table->size){
+		if(hti->table->slots[hti->slot] != NULL){
+			uint32_t temp_slot = hti->slot;
+			hti->slot += 1;
+			return hti->table->slots[temp_slot];
+			//return next node if available, and increment iterator slot
+		}
+		else{
+			hti->slot += 1;
+			//if node is NULL, dont return the NULL pointer, skip it by incrementing iterator slot
+		}
+	}
+	return NULL;
+	//if iterated through entire hash table, return NULL
+}
+
+
+
 
 int main(void){
-	Node *a = NULL;
-	HashTable *ht = ht_create(2);
-	ht_insert(ht, "Hello");
-	ht_insert(ht, "World");
-	ht_insert(ht, "World");
-	a = ht_lookup(ht, "World");
-	node_print(a);
-	ht_print(ht);
+	//Node *a = NULL;
+	HashTable *ht = ht_create(4);
+	ht_insert(ht, "hello");
+	ht_insert(ht, "world");
+	HashTableIterator *hti = hti_create(ht);
+	Node *n = NULL;
+	while((n = ht_iter(hti)) != NULL){
+		printf("%s\n", n->word);
+	}
+	hti_delete(&hti);
+	//ht_insert(ht, "World");
+	//a = ht_lookup(ht, "World");
+	//node_print(a);
+	//ht_print(ht);
 	ht_delete(&ht);
 	return 0;
 }
