@@ -17,7 +17,6 @@ BitVector *bv_create(uint32_t length){
 	if(length % 8 != 0){
 		temp_length += 1;
 	}
-	printf("temp_length = %"PRIu32"\n", temp_length);
 	bv->vector = (uint8_t *)calloc(temp_length, sizeof(uint8_t));
 	//FIND A WAY TO TEST IF THERE IS SUFFICIENT MEMORY TO ALLOCATE
 	return bv;
@@ -46,6 +45,19 @@ bool bv_set_bit(BitVector *bv, uint32_t i){
 	return true;
 }
 
+bool bv_clr_bit(BitVector *bv, uint32_t i){
+	if(i < 0 || i > bv_length(bv)){
+		return false;
+	}
+	uint8_t temp = 1;	//1 = 2^0
+	for(uint32_t x = 0; x < (i % 8); x += 1){
+		temp *= 2;
+	}
+	//temp = 2^bit location
+	uint8_t cmp_vector = 255 - temp;	//array of 1's except for where to clear the bit
+	bv->vector[i/8] = bv->vector[i/8] & cmp_vector;	//clear the bit of vector
+	return true;
+}
 
 void bv_print(BitVector *bv){
 	uint32_t temp = bv->length / 8;
@@ -62,6 +74,8 @@ int main(void){
 	bv_set_bit(bv, 0);
 	bv_set_bit(bv, 2);
 	bv_set_bit(bv, 8);
+	bv_clr_bit(bv, 8);
+	bv_clr_bit(bv, 2);
 	bv_print(bv);
 	bv_delete(&bv);
 }
