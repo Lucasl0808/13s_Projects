@@ -48,7 +48,11 @@ bool bv_set_bit(BitVector *bv, uint32_t i){
 
 
 void bv_print(BitVector *bv){
-	for(uint32_t i = 0; i < bv->length; i += 1){
+	uint32_t temp = bv->length / 8;
+	if(bv->length %8 != 0){
+		temp += 1;
+	}
+	for(uint32_t i = 0; i < temp; i += 1){
 		printf("current byte value = %"PRIu8 "\n", bv->vector[i]);
 	}
 }
@@ -57,5 +61,7 @@ int main(void){
 	BitVector *bv = bv_create(10);
 	bv_set_bit(bv, 0);
 	bv_set_bit(bv, 2);
+	bv_set_bit(bv, 8);
 	bv_print(bv);
+	bv_delete(&bv);
 }
