@@ -59,6 +59,21 @@ bool bv_clr_bit(BitVector *bv, uint32_t i){
 	return true;
 }
 
+bool bv_get_bit(BitVector *bv, uint32_t i){
+	if(i < 0 || i > bv_length(bv)){
+		return false;
+	}
+	uint8_t value = bv->vector[i/8] >> (i % 8);
+
+	//shifts desired bit into the 0th index
+	if(value % 2 == 1){	//if desired bit = 1
+		return true;
+	}
+	else{
+		return false;	//if desired bit = 0
+	}
+}
+
 void bv_print(BitVector *bv){
 	uint32_t temp = bv->length / 8;
 	if(bv->length %8 != 0){
@@ -76,6 +91,12 @@ int main(void){
 	bv_set_bit(bv, 8);
 	bv_clr_bit(bv, 8);
 	bv_clr_bit(bv, 2);
+	bv_set_bit(bv, 5);
+	bv_set_bit(bv, 9);
+	bv_set_bit(bv, 10);
+	if(bv_get_bit(bv, 10)){
+		printf("index is 1\n");
+	}
 	bv_print(bv);
 	bv_delete(&bv);
 }
