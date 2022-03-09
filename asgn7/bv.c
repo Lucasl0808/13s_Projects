@@ -12,13 +12,15 @@ struct BitVector{
 BitVector *bv_create(uint32_t length){
 	//parameter length is in bits
 	BitVector *bv = (BitVector *)malloc(sizeof(BitVector));
+	if(bv == NULL){
+		return NULL;
+	}
 	bv->length = length;
 	uint32_t temp_length = length / 8;
 	if(length % 8 != 0){
 		temp_length += 1;
 	}
 	bv->vector = (uint8_t *)calloc(temp_length, sizeof(uint8_t));
-	//FIND A WAY TO TEST IF THERE IS SUFFICIENT MEMORY TO ALLOCATE
 	return bv;
 }
 

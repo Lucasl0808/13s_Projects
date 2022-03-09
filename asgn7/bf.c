@@ -39,7 +39,23 @@ void bf_insert(BloomFilter *bf, char *word){
 	bv_set_bit(bf->filter, index1);
 	bv_set_bit(bf->filter, index2);
 	bv_set_bit(bf->filter, index3);
-
-
-
 }
+
+bool bf_probe(BloomFilter *bf, char *word){
+	int index1 = hash(bf->primary, word) % bv_length(bf->filter);
+	int index2 = hash(bf->secondary, word) % bv_length(bf->filter);
+	int index3 = hash(bf->tertiary, word) % bv_length(bf->filter);
+	
+	if(bv_get_bit(bf->filter, index1) && bv_get_bit(bf->filter, index2) && bv_get_bit(bf->filter, index3)){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+void bf_print(BloomFilter *bf){
+	bv_print(bf->filter);
+}
+
+
