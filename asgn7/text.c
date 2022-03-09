@@ -1,14 +1,19 @@
 #include <ctype.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <math.h>
+#include <stdlib.h>
 
+#include "ht.h"
+#include "bv.h"
+#include "bf.h"
 #include "parser.h"
 #include "text.h"
 
 
 #define WORD "[_a-zA-Z]+(['-][_a-zA-Z]+)*"
+
+uint32_t noiselimit = 100;
 
 struct Text{
 	HashTable *ht;
@@ -19,7 +24,7 @@ struct Text{
 Text *text_create(FILE *infile, Text *noise){
 	//Hashtable is an array of nodes
 	Text *text = (Text *)malloc(sizeof(Text));
-	if(test == NULL){
+	if(text == NULL){
 		return NULL;
 	}
 	text->ht = ht_create((0x1 << 19));	//1 x 2^19
@@ -30,24 +35,43 @@ Text *text_create(FILE *infile, Text *noise){
 	regcomp(&re, WORD, REG_EXTENDED);
 
 	char *word = NULL;
-	while((word = next_word(infile, &re)) != NULL){
-		word = tolower(word);
-
-		if(noise == NULL){
-			//add all read words to the text and return it, text will be the noise
+	if(noise == NULL){	//if creating noise text
+		while((word = next_word(infile, &re)) != NULL){
+			int count = 0;
+			while(word[count]){
+				word[count] = tolower(word[count]);
+				count += 1;
+			}
+			printf("Noise word = %s\n", word);
 			ht_insert(text->ht, word);
 			bf_insert(text->bf, word);
 			text->word_count += 1;
-		}
-		else{
-			//filter noise words out of text and add words to text, then return text
-			if(ht_lookup(noise->ht, word) == NULL){
-				//if word is not inside the noise...
-				ht_insert(text->ht, word);
-				bf_insert(text->bf, word);
-				text->word_count += 1;
+			if(text->word_count == noiselimit){
+				break;
 			}
 		}
+		return text;
+	}
+	else{	//if noise text is given
+		while((word = next_word(infile, &re)) != NULL){
+			int count = 0;
+			while(word[count]){
+				word[count] = tolower(word[count]);
+				count += 1;
+			}
+			printf("text word = %s\n", word);
+			//filter noise words out of text and add words to text, then return text
+			if(text_contains(noise, word)){	//if word is inside the noise text, skip over that word
+				continue;
+			}
+			else{	//if word is not inside noise, add it to the text
+				ht_insert(text->ht, word);
+				bf_insert(text->bf, word);
+				text->word_count += 1;			
+			}
+			
+		}
+		return text;
 	}
 }
 
@@ -57,7 +81,7 @@ void text_delete(Text **text){
 	free(*text);
 	*text = NULL;
 }
-
+/*
 double text_dist(Text *text1, Text *text2, Metric metric){
 	//figure out how to access metric value
 	//just access them using EUCLIDEAN, COSINE, or MANHATTAN
@@ -72,7 +96,7 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 	}
 	
 }
-
+*/
 bool text_contains(Text *text, char *word){
 	if(bf_probe(text->bf, word)){
 		if(ht_lookup(text->ht, word)){
@@ -94,5 +118,12 @@ void text_print(Text *text){
 }
 
 int main(void){
-	
+	FILE *infile = fopen("test.txt", "r");
+	FILE *infile1 = fopen("test1.txt", "r");
+	Text *noisetext = text_create(infile, NULL);
+	Text *text = text_create(infile1, noisetext);
+
+	//text_print(noisetext);
+	text_print(text);
+	return 0;
 }
