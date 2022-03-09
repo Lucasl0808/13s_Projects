@@ -1,5 +1,11 @@
+#include <stdlib.h>
+#include <inttypes.h>
+#include <stdio.h>
+
+#include "bv.h"
 #include "bf.h"
 #include "salts.h"
+#include "speck.h"
 
 struct BloomFilter{
 	uint64_t primary[2];
@@ -9,7 +15,7 @@ struct BloomFilter{
 };
 
 BloomFilter *bf_create(uint32_t size){
-	BloomFilter *bf = (BloomFilter *)malloc(BloomFilter);
+	BloomFilter *bf = (BloomFilter *)malloc(sizeof(BloomFilter));
 	bf->primary[0] = SALT_PRIMARY_LO;
 	bf->primary[1] = SALT_PRIMARY_HI;
 	bf->secondary[0] = SALT_SECONDARY_LO;
@@ -27,7 +33,7 @@ void bf_delete(BloomFilter **bf){
 }
 
 uint32_t bf_size(BloomFilter *bf){
-	return bf->filter->length;
+	return bv_length(bf->filter);
 }
 
 void bf_insert(BloomFilter *bf, char *word){

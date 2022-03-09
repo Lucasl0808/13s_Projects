@@ -82,7 +82,6 @@ Node *ht_insert(HashTable *ht, char *word){
 		if(ht->slots[index] == NULL){
 			ht->slots[index] = node_create(word);
 			ht->slots[index]->count = 1;
-			//ht->size += 1;
 			return ht->slots[index];	//return pointer to the node at inserted index
 		}
 		else if(ht->slots[index] != NULL){
@@ -130,9 +129,7 @@ Node *ht_iter(HashTableIterator *hti){
 	//if iterated through entire hash table, return NULL
 }
 
-
-
-
+/*
 int main(void){
 	//Node *a = NULL;
 	HashTable *ht = ht_create(4);
@@ -151,4 +148,4 @@ int main(void){
 	ht_delete(&ht);
 	return 0;
 }
-
+*/
