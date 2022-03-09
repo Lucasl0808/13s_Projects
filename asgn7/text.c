@@ -50,6 +50,7 @@ Text *text_create(FILE *infile, Text *noise){
 				break;
 			}
 		}
+		regfree(&re);
 		return text;
 	}
 	else{	//if noise text is given
@@ -71,6 +72,7 @@ Text *text_create(FILE *infile, Text *noise){
 			}
 			
 		}
+		regfree(&re);
 		return text;
 	}
 }
@@ -122,8 +124,10 @@ int main(void){
 	FILE *infile1 = fopen("test1.txt", "r");
 	Text *noisetext = text_create(infile, NULL);
 	Text *text = text_create(infile1, noisetext);
-
-	//text_print(noisetext);
 	text_print(text);
+	text_delete(&text);
+	text_delete(&noisetext);
+	fclose(infile);
+	fclose(infile1);
 	return 0;
 }
