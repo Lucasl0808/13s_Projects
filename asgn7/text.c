@@ -93,15 +93,50 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 	HashTableIterator *hti2 = hti_create(text2->ht);
 	double sum = 0;
 	Node *n = NULL;
-	/*
+	
 	if(metric == COSINE){
-
+		while((n = ht_iter(hti)) != NULL){
+			double freq1 = text_frequency(text1, n->word);
+			double freq2 = text_frequency(text2, n->word);
+			sum += (freq1 * freq2);
+		}
+		while((n = ht_iter(hti2)) != NULL){
+			if(text_contains(text1, n->word)){
+				continue;
+			}
+			else{
+				double freq1 = text_frequency(text1, n->word);
+				double freq2 = text_frequency(text2, n->word);
+				sum += (freq1 * freq2);
+			}
+		}
+		sum = 1 - sum;
+		return sum;
 	}
 	else if(metric == EUCLIDEAN){
-
+		while((n = ht_iter(hti)) != NULL){
+			double freq1 = text_frequency(text1, n->word);
+			double freq2 = text_frequency(text2, n->word);
+			double temp = (freq1 - freq2);
+			temp = (temp * temp);
+			sum += temp;
+		}
+		while((n = ht_iter(hti2)) != NULL){
+			if(text_contains(text1, n->word)){
+				continue;
+			}
+			else{
+				double freq1 = text_frequency(text1, n->word);
+				double freq2 = text_frequency(text2, n->word);
+				double temp = (freq1 - freq2);
+				temp = (temp * temp);
+				sum += temp;
+			}
+		}
+		sum = sqrt(sum);
+		return sum;
 	}
-	*/
-	if(metric == MANHATTAN){
+	else if(metric == MANHATTAN){
 		while((n = ht_iter(hti)) != NULL){	//iterate through text 1's hash table
 			sum += fabs((text_frequency(text1, n->word)) - text_frequency(text2, n->word));
 
@@ -159,7 +194,7 @@ int main(void){
 	Text *text = text_create(infile1, noisetext);
 	Text *text2 = text_create(infile2, noisetext);
 	text_print(text);
-	printf("text distance = %.15f\n", text_dist(text, text2, MANHATTAN));
+	printf("text distance = %.15f\n", text_dist(text, text2, EUCLIDEAN));
 	text_delete(&text);
 	text_delete(&text2);
 	text_delete(&noisetext);
