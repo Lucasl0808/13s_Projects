@@ -83,12 +83,15 @@ void text_delete(Text **text){
 	free(*text);
 	*text = NULL;
 }
+
 /*
 double text_dist(Text *text1, Text *text2, Metric metric){
 	//figure out how to access metric value
 	//just access them using EUCLIDEAN, COSINE, or MANHATTAN
+	//if word is in text 1 but not text 2 or vice versa, then that word frequency is set to 0
+	//otherwise, take all words in a given text and normalize it 
 	if(metric == COSINE){
-
+		
 	}
 	else if(metric == EUCLIDEAN){
 
@@ -98,7 +101,18 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 	}
 	
 }
+
 */
+double text_frequency(Text *text, char *word){
+	if(text_contains(text, word) == false){	//if word is not inside text
+		return 0;
+	}
+	else{
+		Node *n = ht_lookup(text->ht, word);
+		double freq = (double)n->count / (double)text->word_count;
+		return freq;
+	}
+}
 bool text_contains(Text *text, char *word){
 	if(bf_probe(text->bf, word)){
 		if(ht_lookup(text->ht, word)){
@@ -125,6 +139,7 @@ int main(void){
 	Text *noisetext = text_create(infile, NULL);
 	Text *text = text_create(infile1, noisetext);
 	text_print(text);
+	printf("frequency of like = %lf\n", text_frequency(text, "like")); 
 	text_delete(&text);
 	text_delete(&noisetext);
 	fclose(infile);
