@@ -84,25 +84,43 @@ void text_delete(Text **text){
 	*text = NULL;
 }
 
-/*
+
 double text_dist(Text *text1, Text *text2, Metric metric){
-	//figure out how to access metric value
-	//just access them using EUCLIDEAN, COSINE, or MANHATTAN
-	//if word is in text 1 but not text 2 or vice versa, then that word frequency is set to 0
-	//otherwise, take all words in a given text and normalize it 
+	//just access them using EUCLIDEAN, COSINE, or MANHATTAN 
+	//in each, run a loop for each hash table, using a hash table iterator to get each word in the table
+	//iterate over each hash table and check frequency of each word and compare
+	HashTableIterator *hti = hti_create(text1->ht);
+	HashTableIterator *hti2 = hti_create(text2->ht);
+	double sum = 0;
+	Node *n = NULL;
+	/*
 	if(metric == COSINE){
-		
+
 	}
 	else if(metric == EUCLIDEAN){
 
 	}
-	else if(metric == MANHATTAN){
+	*/
+	if(metric == MANHATTAN){
+		while((n = ht_iter(hti)) != NULL){	//iterate through text 1's hash table
+			sum += fabs((text_frequency(text1, n->word)) - text_frequency(text2, n->word));
 
+		}
+		while((n = ht_iter(hti2)) != NULL){	//iterate through text2, if word appeared in text 1 ignore it
+			if(text_contains(text1, n->word)){
+				continue;
+			}
+			else{
+				sum += fabs((text_frequency(text1, n->word) - text_frequency(text2, n->word)));
+			}
+		}
+		return sum;
 	}
+	return sum;
 	
 }
 
-*/
+
 double text_frequency(Text *text, char *word){
 	if(text_contains(text, word) == false){	//if word is not inside text
 		return 0;
@@ -136,11 +154,14 @@ void text_print(Text *text){
 int main(void){
 	FILE *infile = fopen("test.txt", "r");
 	FILE *infile1 = fopen("test1.txt", "r");
+	FILE *infile2 = fopen("test2.txt", "r");
 	Text *noisetext = text_create(infile, NULL);
 	Text *text = text_create(infile1, noisetext);
+	Text *text2 = text_create(infile2, noisetext);
 	text_print(text);
-	printf("frequency of like = %lf\n", text_frequency(text, "like")); 
+	printf("text distance = %.15f\n", text_dist(text, text2, MANHATTAN));
 	text_delete(&text);
+	text_delete(&text2);
 	text_delete(&noisetext);
 	fclose(infile);
 	fclose(infile1);
