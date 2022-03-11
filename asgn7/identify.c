@@ -3,6 +3,8 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <string.h>
 
 #include "bf.h"
 #include "bv.h"
@@ -21,6 +23,7 @@ int main(int argc, char **argv){
 	int matches = 5;
 	//noiselimit = 100 defined in text.c
 	Metric metric = EUCLIDEAN;
+	int metric_i = 1;
 	while((opt = (getopt(argc, argv, "d:n:k:l:emch"))) != -1){
 		switch(opt){
 		case 'd':
@@ -50,9 +53,11 @@ int main(int argc, char **argv){
 			break;
 		case 'm':
 			metric = MANHATTAN;
+			metric_i = 2;
 			break;
 		case 'c':
 			metric = COSINE;
+			metric_i = 3;
 			break;
 		case 'h':
 			fprintf(stderr, "Program Details:\n");
@@ -72,5 +77,65 @@ int main(int argc, char **argv){
 			return 0;
 		}
 	}
-	//begin main file
+	if(db_detect == false){
+		database = fopen("lib.db", "r");
+	}
+	if(noise_detect == false){
+		noise = fopen("noise.txt", "r");
+	}
+	//create noise text
+	Text *noisetext = text_create(noise, NULL);
+	
+	//create text from infile passed into stdin
+	FILE *infile = stdin;
+	Text *text1 = text_create(infile, noisetext);
+	
+	//scan first line from database
+	uint32_t n;
+	fscanf(database, "%"SCNu32"\n", &n);
+	
+	//create priority queue that holds n elements
+	PriorityQueue *q = pq_create(n);
+
+	//use fgets() in a loop to read an author, and use fgets() again to get the author's text and remove the trailing newline
+	uint32_t pairs = 0;
+	while(pairs != n){
+		char authorname[2048];
+		fgets(authorname, sizeof(authorname), database);
+		//replace second to last element in the string with a null character(second to last element is newline char)
+		authorname[strlen(authorname) - 1] = '\0';
+		char *author = authorname;
+		char authortext[2048];
+		fgets(authortext, sizeof(authortext), database);
+		authortext[strlen(authortext) -1] = '\0';
+		FILE *text2_file = fopen(authortext, "r");
+		if(text2_file == NULL){
+			pairs += 1;
+			continue;
+		}
+		Text *text2 = text_create(text2_file, noisetext);
+		double dist = text_dist(text1, text2, metric);
+		enqueue(q, author, dist);
+		fclose(text2_file);
+		pairs += 1;
+	}
+	char *metric_str;
+	if(metric_i == 1){
+		metric_str = "Euclidean distance";
+	}
+	else if(metric_i == 2){
+		metric_str = "Manhattan distance";
+	}
+	else{
+		metric_str = "Cosine distance";
+	}
+	printf("Top %d, metric: %s, noise limit: %"PRIu32"\n", matches, metric_str, noiselimit);
+	for(int i = 0; i < matches; i +=1){
+		char *author;
+		double dist = 0;
+		dequeue(q, &author, &dist);
+		printf("%d) %s [%.15f]\n", i+1, author, dist);
+	}
+	return 1;
+	
 }
