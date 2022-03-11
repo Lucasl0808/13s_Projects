@@ -87,8 +87,8 @@ int main(int argc, char **argv){
 	Text *noisetext = text_create(noise, NULL);
 	
 	//create text from infile passed into stdin
-	FILE *infile = stdin;
-	Text *text1 = text_create(infile, noisetext);
+	//FILE *infile = stdin;
+	Text *text1 = text_create(stdin, noisetext);
 	
 	//scan first line from database
 	uint32_t n;
@@ -99,12 +99,15 @@ int main(int argc, char **argv){
 
 	//use fgets() in a loop to read an author, and use fgets() again to get the author's text and remove the trailing newline
 	uint32_t pairs = 0;
+	//char *temp = NULL;
 	while(pairs != n){
-		char authorname[2048];
-		fgets(authorname, sizeof(authorname), database);
+		char *temp = NULL;
+		char author[2048];
+		fgets(author, sizeof(author), database);
 		//replace second to last element in the string with a null character(second to last element is newline char)
-		authorname[strlen(authorname) - 1] = '\0';
-		char *author = authorname;
+		author[strlen(author) - 1] = '\0';
+		temp = strndup(author, 2048);
+
 		char authortext[2048];
 		fgets(authortext, sizeof(authortext), database);
 		authortext[strlen(authortext) -1] = '\0';
@@ -115,10 +118,13 @@ int main(int argc, char **argv){
 		}
 		Text *text2 = text_create(text2_file, noisetext);
 		double dist = text_dist(text1, text2, metric);
-		enqueue(q, author, dist);
+		enqueue(q, temp, dist);
 		fclose(text2_file);
+		text_delete(&text2);
 		pairs += 1;
+		//free(temp);
 	}
+	
 	char *metric_str;
 	if(metric_i == 1){
 		metric_str = "Euclidean distance";
@@ -135,7 +141,13 @@ int main(int argc, char **argv){
 		double dist = 0;
 		dequeue(q, &author, &dist);
 		printf("%d) %s [%.15f]\n", i+1, author, dist);
+		free(author);
 	}
+	text_delete(&text1);
+	text_delete(&noisetext);
+	fclose(database);
+	fclose(noise);
+	pq_delete(&q);
 	return 1;
 	
 }
