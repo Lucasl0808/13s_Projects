@@ -40,6 +40,12 @@ PriorityQueue *pq_create(uint32_t capacity){
 }
 
 void pq_delete(PriorityQueue **q){
+	while(pq_size(*q) > 0){
+		char *temp = NULL;
+		double temp1 = 0;
+		dequeue(*q, &temp, &temp1);
+		free(temp);
+	}
 	free((*q)->array);
 	free(*q);
 	*q = NULL;
@@ -72,7 +78,6 @@ bool enqueue(PriorityQueue *q, char *author, double dist){
 		q->size += 1;
 		return true;
 	}
-
 	q->array[pq_size(q)] = index_create(author, dist);
 	q->size += 1;
 

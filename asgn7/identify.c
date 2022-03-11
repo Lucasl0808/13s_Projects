@@ -122,7 +122,6 @@ int main(int argc, char **argv){
 		fclose(text2_file);
 		text_delete(&text2);
 		pairs += 1;
-		//free(temp);
 	}
 	
 	char *metric_str;
@@ -140,7 +139,7 @@ int main(int argc, char **argv){
 		char *author;
 		double dist = 0;
 		dequeue(q, &author, &dist);
-		printf("%d) %s [%.15f]\n", i+1, author, dist);
+		printf("%d) %s [%.15lf]\n", i+1, author, dist);
 		free(author);
 	}
 	text_delete(&text1);

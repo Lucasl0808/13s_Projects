@@ -42,7 +42,7 @@ Text *text_create(FILE *infile, Text *noise){
 				word[count] = tolower(word[count]);
 				count += 1;
 			}
-			printf("Noise word = %s\n", word);
+			//printf("Noise word = %s\n", word);
 			ht_insert(text->ht, word);
 			bf_insert(text->bf, word);
 			text->word_count += 1;
@@ -60,7 +60,7 @@ Text *text_create(FILE *infile, Text *noise){
 				word[count] = tolower(word[count]);
 				count += 1;
 			}
-			printf("text word = %s\n", word);
+			//printf("text word = %s\n", word);
 			//filter noise words out of text and add words to text, then return text
 			if(text_contains(noise, word)){	//if word is inside the noise text, skip over that word
 				continue;
@@ -111,6 +111,8 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 			}
 		}
 		sum = 1 - sum;
+		hti_delete(&hti);
+		hti_delete(&hti2);
 		return sum;
 	}
 	else if(metric == EUCLIDEAN){
@@ -134,6 +136,8 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 			}
 		}
 		sum = sqrt(sum);
+		hti_delete(&hti);
+		hti_delete(&hti2);
 		return sum;
 	}
 	else if(metric == MANHATTAN){
@@ -149,8 +153,12 @@ double text_dist(Text *text1, Text *text2, Metric metric){
 				sum += fabs((text_frequency(text1, n->word) - text_frequency(text2, n->word)));
 			}
 		}
+		hti_delete(&hti);
+		hti_delete(&hti2);
 		return sum;
 	}
+	hti_delete(&hti);
+	hti_delete(&hti2);
 	return sum;
 	
 }
@@ -185,7 +193,7 @@ void text_print(Text *text){
 	bf_print(text->bf);
 	printf("word count = %"PRIu32"\n", text->word_count);
 }
-
+/*
 int main(void){
 	FILE *infile = fopen("test.txt", "r");
 	FILE *infile1 = fopen("test1.txt", "r");
@@ -202,3 +210,4 @@ int main(void){
 	fclose(infile1);
 	return 0;
 }
+*/
