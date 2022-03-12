@@ -41,12 +41,11 @@ Text *text_create(FILE *infile, Text *noise) {
                 word[count] = tolower(word[count]);
                 count += 1;
             }
-            //printf("Noise word = %s\n", word);
             ht_insert(text->ht, word);
             bf_insert(text->bf, word);
             text->word_count += 1;
             if (text->word_count == noiselimit) {
-                break;
+                break; //stop adding to noise text if reached noise limit
             }
         }
         regfree(&re);
@@ -58,7 +57,6 @@ Text *text_create(FILE *infile, Text *noise) {
                 word[count] = tolower(word[count]);
                 count += 1;
             }
-            //printf("text word = %s\n", word);
             //filter noise words out of text and add words to text, then return text
             if (text_contains(
                     noise, word)) { //if word is inside the noise text, skip over that word
@@ -159,7 +157,7 @@ double text_frequency(Text *text, char *word) {
     } else {
         Node *n = ht_lookup(text->ht, word);
         double freq = (double) n->count / (double) text->word_count;
-        return freq;
+        return freq; // store node that contains frequency of the word to do arithmetic on it
     }
 }
 bool text_contains(Text *text, char *word) {
@@ -179,21 +177,3 @@ void text_print(Text *text) {
     bf_print(text->bf);
     printf("word count = %" PRIu32 "\n", text->word_count);
 }
-/*
-int main(void){
-	FILE *infile = fopen("test.txt", "r");
-	FILE *infile1 = fopen("test1.txt", "r");
-	FILE *infile2 = fopen("test2.txt", "r");
-	Text *noisetext = text_create(infile, NULL);
-	Text *text = text_create(infile1, noisetext);
-	Text *text2 = text_create(infile2, noisetext);
-	text_print(text);
-	printf("text distance = %.15f\n", text_dist(text, text2, EUCLIDEAN));
-	text_delete(&text);
-	text_delete(&text2);
-	text_delete(&noisetext);
-	fclose(infile);
-	fclose(infile1);
-	return 0;
-}
-*/

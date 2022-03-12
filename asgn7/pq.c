@@ -7,7 +7,7 @@
 
 typedef struct PQindex PQindex;
 
-struct PQindex {
+struct PQindex { //local struct to hold author and corresponding distance
     char *author;
     double dist;
 };
@@ -18,19 +18,12 @@ struct PriorityQueue {
     PQindex *array;
 };
 
-PQindex index_create(char *author, double dist) {
+PQindex index_create(char *author, double dist) { //constructor for local struct
     PQindex PQindex;
-    //PQindex *PQindex = (PQindex *)malloc(sizeof(PQindex));
     PQindex.author = author;
     PQindex.dist = dist;
     return PQindex;
 }
-/*
-void index_delete(PQindex **PQindex){
-	free(*PQindex);
-	*PQindex = NULL;
-}
-*/
 PriorityQueue *pq_create(uint32_t capacity) {
     PriorityQueue *q = (PriorityQueue *) malloc(sizeof(PriorityQueue));
     q->capacity = capacity;
@@ -76,8 +69,8 @@ bool enqueue(PriorityQueue *q, char *author, double dist) {
         q->size += 1;
         return true;
     }
-    q->array[pq_size(q)] = index_create(author, dist);
-    q->size += 1;
+    q->array[pq_size(q)] = index_create(author, dist); //create struct with parameters
+    q->size += 1; //enqueue struct at the end of the array and increment the size of it
 
     for (uint32_t i = 1; i < pq_size(q); i += 1) {
         uint32_t j = i;
@@ -89,6 +82,7 @@ bool enqueue(PriorityQueue *q, char *author, double dist) {
         q->array[j] = temp;
     }
     return true;
+    //using insertion sort method
 }
 
 bool dequeue(PriorityQueue *q, char **author, double *dist) {
@@ -112,36 +106,8 @@ uint32_t pq_size(PriorityQueue *q) {
     return q->size;
 }
 
-/*
-void index_print(PQindex *PQindex){
-	printf("author = %s\n", PQindex->author);
-	printf("distance = %.15f\n", PQindex->dist);
-}
-
-*/
 void pq_print(PriorityQueue *q) {
     for (uint32_t i = 0; i < pq_size(q); i += 1) {
         printf("index author = %s, dist = %.15f\n", q->array[i].author, q->array[i].dist);
     }
 }
-
-/*
-int main(void){
-	PriorityQueue *q = pq_create(4);
-	PQindex one = index_create("Kanye", 0.0023);
-	one.dist = 0.0245;
-	PQindex two = index_create("Jay-Z", .1);
-	PQindex three = index_create("21 Savage", .0002);
-	index_print(&one);
-	enqueue(q, two.author, two.dist);
-	enqueue(q, one.author, one.dist);
-	enqueue(q, three.author, three.dist);
-	char *a;
-	double d = 0;
-	dequeue(q, &a, &d);
-	printf("dequeue author = %s, distance = %.15f\n", a, d);
-	pq_print(q);
-	pq_delete(&q);
-	return 1;
-}
-*/

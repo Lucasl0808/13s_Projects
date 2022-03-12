@@ -71,19 +71,15 @@ Node *ht_lookup(HashTable *ht, char *word) {
     while (count != ht_size(ht)) {
         if (ht->slots[index] != NULL) {
             if (strcmp(ht->slots[index]->word, word) == 0) { //if found word
-                return ht->slots[index];
+                return ht->slots[index]; //return node where word is found
             }
             index += 1;
             index = index % ht_size(ht);
-            count += 1;
+            count
+                += 1; //if node exists but word isnt there, increment variables to check next index
         } else if (ht->slots[index] == NULL) {
-            return NULL;
+            return NULL; //if node that is read does not exist, return NULL
         }
-        /*
-		index += 1;
-		index = index % ht_size(ht);
-		count += 1;
-		*/
     }
 
     return NULL;
@@ -141,24 +137,3 @@ Node *ht_iter(HashTableIterator *hti) {
     return NULL;
     //if iterated through entire hash table, return NULL
 }
-
-/*
-int main(void){
-	//Node *a = NULL;
-	HashTable *ht = ht_create(4);
-	ht_insert(ht, "hello");
-	ht_insert(ht, "world");
-	HashTableIterator *hti = hti_create(ht);
-	Node *n = NULL;
-	while((n = ht_iter(hti)) != NULL){
-		printf("%s\n", n->word);
-	}
-	hti_delete(&hti);
-	//ht_insert(ht, "World");
-	//a = ht_lookup(ht, "World");
-	//node_print(a);
-	//ht_print(ht);
-	ht_delete(&ht);
-	return 0;
-}
-*/

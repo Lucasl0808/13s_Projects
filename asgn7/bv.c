@@ -85,22 +85,3 @@ void bv_print(BitVector *bv) {
 		printf("current byte value = %"PRIu8 "\n", bv->vector[i]);
 	}*/
 }
-
-/*
-int main(void){
-	BitVector *bv = bv_create(10);
-	bv_set_bit(bv, 0);
-	bv_set_bit(bv, 2);
-	bv_set_bit(bv, 8);
-	bv_clr_bit(bv, 8);
-	bv_clr_bit(bv, 2);
-	bv_set_bit(bv, 5);
-	bv_set_bit(bv, 9);
-	bv_set_bit(bv, 10);
-	if(bv_get_bit(bv, 10)){
-		printf("index is 1\n");
-	}
-	bv_print(bv);
-	bv_delete(&bv);
-}
-*/

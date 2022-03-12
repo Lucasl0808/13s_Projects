@@ -83,7 +83,6 @@ int main(int argc, char **argv) {
     Text *noisetext = text_create(noise, NULL);
 
     //create text from infile passed into stdin
-    //FILE *infile = stdin;
     Text *text1 = text_create(stdin, noisetext);
 
     //scan first line from database
@@ -95,14 +94,13 @@ int main(int argc, char **argv) {
 
     //use fgets() in a loop to read an author, and use fgets() again to get the author's text and remove the trailing newline
     uint32_t pairs = 0;
-    //char *temp = NULL;
     while (pairs != n) {
         char *temp = NULL;
         char author[2048];
         fgets(author, sizeof(author), database);
         //replace second to last element in the string with a null character(second to last element is newline char)
         author[strlen(author) - 1] = '\0';
-        temp = strndup(author, 2048);
+        temp = strndup(author, 2048); //create a duplicate of the author string to pass in
 
         char authortext[2048];
         fgets(authortext, sizeof(authortext), database);
@@ -117,7 +115,8 @@ int main(int argc, char **argv) {
         enqueue(q, temp, dist);
         fclose(text2_file);
         text_delete(&text2);
-        pairs += 1;
+        pairs
+            += 1; //increment pairs every time an author and text is read so that we can break out of the loop
     }
 
     char *metric_str;
@@ -134,12 +133,12 @@ int main(int argc, char **argv) {
         double dist = 0;
         dequeue(q, &author, &dist);
         printf("%d) %s [%.15lf]\n", i + 1, author, dist);
-        free(author);
+        free(author); //free duplicated string
     }
     text_delete(&text1);
     text_delete(&noisetext);
     fclose(database);
     fclose(noise);
-    pq_delete(&q);
+    pq_delete(&q); //inside pq delete, deletes all remaining string duplicates
     return 1;
 }
