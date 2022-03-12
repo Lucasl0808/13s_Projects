@@ -1,0 +1,304 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn5 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{2/4/2022}
+\begin{document}\maketitle
+\section{Program Details}\label{ss:details}
+We will create three functions: one that creates a public and private key pair using large prime numbers, one that encrypts a file using a public key, and one that decrypts the file using the private key. We will use a randomizer to generate the large primes for the keys.
+
+\section{functions and pseudocode}\label{ss:functions}
+for each function that needs random states, declare global variable state.
+\begin{enumerate}
+\item randstateinit(seed)
+	\begin{enumerate}
+	\item set Mersenne Twister initializer to state
+	\item set srandom to seed
+	\item set randseed with variable state to random seed
+	\end{enumerate}
+\item randstateclear()
+	\begin{enumerate}
+	\item clear memory of state
+	\end{enumerate}
+\item powmod(out, base, exponent, mod)
+	\begin{enumerate}
+	\item create mpz temp variables to store parameters so they do not change
+	\item v = 1
+	\item p = base
+	\item tempexpo
+	\item while tempexpo > 0
+		\begin{enumerate}
+		\item if tempexpo is odd
+			\begin{enumerate}
+			\item v= (v x p) mod(mod)
+			\end{enumerate}
+		\item p = (p x p) mod(mod)
+		\item tempexpo = tempexpo floor division by 2
+		\end{enumerate}
+	\item out = v
+	\item clear mpz variables
+	\end{enumerate}
+\item isprime(n, iters)
+	\begin{enumerate}
+	\item return true if n is less than 4
+	\item return false if n is even
+	\item r = (n-1) / \(2^s r\). r should be odd
+		\begin{enumerate}
+		\item create mpz values s, r, temp to hold values in the above equation
+		\item s = 0, r = 1, temp = n-1
+		\item while temp is not 1
+			\begin{enumerate}
+			\item floor divide temp by 2
+			\item s += 1
+			\item if temp is odd
+				\begin{enumerate}
+				\item r = temp
+				\item break loop
+				\end{enumerate}
+			\end{enumerate}
+		\end{enumerate}
+	\item for loop from 1 - iters
+		\begin{enumerate}
+		\item create mpz variables to store temporoary values for calculations
+		\item a = random number from (2, n-2)
+		\item y = powmod(a, r, n)
+		\item if y is not 1 or n-1
+			\begin{enumerate}
+			\item j = 1
+			\item while j less than or equals s-1 and  y not equals n -1
+				\begin{enumerate}
+				\item if y == 1, clear mpz vars and return
+				\item j = j + 1
+				\end{enumerate}
+			\item if y not equals n - 1. clearn mpz vars and return false
+			\end{enumerate}
+		\end{enumerate}
+	\item clear all mpz vars used in function
+	\item return true
+	\end{enumerate}
+\item makeprime(p, bits, iters)
+	\begin{enumerate}
+	\item create mpz variables to store temporary values. bitcount, prime, randombits
+	\item bitcount = bits
+	\item bitcount = \(2^(bits)\)
+	\item set p = bitcount
+	\item set randombits = bits -1
+	\item set prime to a random number from \(2^b + 2^b -1\) if b = bits
+	\item test using isprime(p, iters)
+		\begin{enumerate}
+		\item keep randomizing prime to a number in the same range to test for each iteration iters
+		\end{enumerate}
+	\item clear mpz variables and p should be set to the prime number
+	\end{enumerate}
+\item gcd(d, a, b)
+	\begin{enumerate}
+	\item make temp variables so d, a, and b are not altered by function
+	\item while tempb is not 0
+		\begin{enumerate}
+		\item t = tempb
+		\item tempb = tempa mod tempb
+		\item tempa = t
+		\end{enumerate}
+	\item d = tempa
+	\item clear mpz vars
+	\end{enumerate}
+\item modinverse(i, a, n)
+	\begin{enumerate}
+	\item make temp mpz variables to store 
+	\item r = n
+	\item rp = a
+	\item t = 0
+	\item tp = 1
+	\item while rp not equal to 0
+		\begin{enumerate}
+		\item q = \(r/rp\)
+		\item r = rp
+		\item rp = r - q x rp
+		\item t = tp
+		\item tp = t - q x tp
+		\end{enumerate}
+	\item if r greater than 1: i = 0
+	\item if t less than 0: t = t + n
+	\item i = t
+	\item return i
+	\end{enumerate}
+\item rsamakepub(p, q, n, e, nbits, iters)
+	\begin{enumerate}
+	\item p, q = prime numbers, n = product of p and q, e = exponent
+	\item makeprime() to make p and q
+	\item log2(n) should be greater than nbits
+	\item p bits in range (nbits/4, (3 x nbits) /4)
+	\item q gets remaining bits from the calculation
+	\item random number using random() and iters to check prime
+	\item lambda(n) = lcm(p-1, q-1)
+		\begin{enumerate}
+		\item do this by calculating gcd(p-1, q-1) and comparing it to the product of p-1 and q-1
+		\item lcm(p-1, q-1) = absolute value(p-1 * q-1) / gcd(p-1, q-1)
+		\end{enumerate}
+	\item get random numbers around nbits
+	\item get the gcd of each random number to find lambda(n)
+	\item while gcd(e, lcm) is not 1 (not coprime)
+		\begin{enumerate}
+		\item randomize e from 0 - nbits
+		\end{enumerate}
+	\item coprime number lambda(n) = public exponent e
+	\item clear mpz variables
+	\end{enumerate}
+\item rsawritepub(n,e,s, char username, file *pbfile)
+	\begin{enumerate}
+	\item open pbfile for writing (if not already open)
+	\item print n in hex with a newline
+	\item print e in hex with a newline
+	\item print s in hex with a newline
+	\item print username with newline
+	\item close pbfile
+	\end{enumerate}
+\item rsareadpub(n,e,s, char username, file *pbfile)
+	\begin{enumerate}
+	\item open pbfile for reading(if not already open)
+	\item scan each line to read then into variables
+	\item scan first line = n
+	\item scan second line = e
+	\item scan thrid line = s
+	\item scan fourth line = username
+	\item close pbfile
+	\end{enumerate}
+\item rsamakepriv(d,e,p,q)
+	\begin{enumerate}
+	\item d = private key to be created, e = public exponent, p and q = primes
+	\item d = modinverse(e, lcm)
+	\end{enumerate}
+\item rsawritepriv(n,d,file *pvfile)
+	\begin{enumerate}
+	\item open pvfile for writing (if not already open)
+	\item write n as a hexstring followed by newline
+	\item write d as a hexstring followed by newline
+	\item close pvfile
+	\end{enumerate}
+\item rsareadpriv(n,d, file *pvfile)
+	\begin{enumerate}
+	\item open pvfile for reading(if not already open)
+	\item scan lines to assign values to variables
+	\item n = scan first line
+	\item d = scan second line
+	\end{enumerate}
+\item rsa encrypt(c,m,e,n)
+	\begin{enumerate}
+	\item use powermod to compute c
+	\item \(c = m^e (mod n)\)
+	\end{enumerate}
+\item rsa encrypt file(file *infile, file *outfile, n, e)
+	\begin{enumerate}
+	\item encrypt in blocks from infile to outfile
+	\item create block size \(k = \lfloor (log_2 (n) -1 / 8) \lfloor\)
+	\item malloc to allocate array that can hold k bytes as a uint8
+	\item set array at 0 to 0xFF
+	\item while unprocessed bytes in infile (using fread - bytes may not be numbers, so scan wont work)
+		\begin{enumerate}
+		\item read k - 1 bytes from infile and place them into the allocated block array starting from 1 (fread)
+		\item convert the read bytes including array(0) into mpzt m (use mpz import for this)
+		\item encrypt m using rsa encrypt() and write it to outfile as a hexstring with a newline. 
+		\end{enumerate}
+	\item close files (unless closed in functions) and free array
+	\end{enumerate}
+\item rsa decrypt(m, c, d, n)
+	\begin{enumerate}
+	\item compute message m using powermod
+	\item \(m = c^d (mod m)\)
+	\end{enumerate}
+\item rsa decrypt file(file infile, file outfile, n, d)
+	\begin{enumerate}
+	\item allocate memory for block size similar to encrypt file
+	\item while unprocessed bytes in infile(use feof() to indicate when the end of the file is reached)
+		\begin{enumerate}
+		\item scan hexstring, save hexstring in variable.
+		\item convert each hexstring back into bytes using mpzexport() j = number of bytes read 
+		\item write out j-1 bytes starting from array(1) to outfile
+		\end{enumerate}
+	\item print newline to outfile for syntax
+	\item free array and close files (unless closed in functions)
+	\end{enumerate}
+\item rsa sign(s,m,d,n)
+	\begin{enumerate}
+	\item calculate s by using power mod
+	\item \(s = m^d (mod n)\)
+	\end{enumerate}
+\item rsa verify(m,s,e,n)
+	\begin{enumerate}
+	\item calculate t by using power mod
+	\item var t = \(s^e (mod n)\)
+	\item if t = m: return true
+	\item else: return false
+	\end{enumerate}
+
+\section{main files and command line inputs}\label{ss:main}
+Key Generator
+\begin{enumerate}
+\item -b = minimum bits for mod(n)
+\item -i = number of iterations to test prime numbers. Default 50
+\item -n pbfile = specifies file that has public key. Default rsa.pub
+\item -d pvfile = specifies file that has private key. Default rsa.priv
+\item -s = specifies random seed for random state. Default time(NULL)
+\item -v  = verbose output
+\item -h = synopsis and usage
+\item set file permissions to 0600 using fchmod and fileno
+\item fileno returns int, so store it in a variable and use it for fchmod
+\item fchmod(fileno integer, 0600 permissions)
+\item randstate init(s)
+\item make public and private keys
+\item getenv(USER) to get username as string
+\item convert username using mpz set str() with a base of 62
+\item write public key to pbfile and private key to pvfile
+\item if verbose output:
+	\begin{enumerate}
+	\item sizeinbase(mpz, base2) to get bit numbers
+	\item print username with newline
+	\item print signature s with newline
+	\item print prime p with newline
+	\item print prime q with newline
+	\item print mod(n) with newline
+	\item print exponent e with newline
+	\item print private key d with newline
+	\item each of these lines should have number of bits for each and the decimal value that correspons to them
+\item randstate clear() and close/clear all files and variables
+\end{enumerate}
+Encrypt
+\begin{enumerate}
+\item -i = input file to encrypt. Default = stdin
+\item -o = output file to encrypt to. Default = stdout
+\item -n = file containing public key. Default = rsa.pub
+\item -v = verbose output
+\item -h = synopsis and usage
+\item open file and exit program if there is a problem opening the file
+\item read public key from pbfile
+\item if verbose:
+	\begin{enumerate}
+	\item print username with newline
+	\item print signature s with newline
+	\item print mod(n) with a newline
+	\item print exponent e with a newline
+	\item print each with their number of bits and their values as a decimal
+	\end{enumerate}
+\item convert username to mpzt using set str() and verify it using rsa verify() 
+\item encrypt file using rsa encrypt file()
+\item close pbfile and clear mpz variables
+\end{enumerate}
+Decrypt
+\begin{enumerate}
+\item -i = input file to decrypt. Default = stdin
+\item -o = output file to decrypt to. Default = stdout
+\item -n = specifies file containing private key. Default = rsa.priv
+\item -v = verbose output
+\item -h = synopsis  and usage
+\item open private key file. Print error if failed
+\item read private key from pvfile
+\item if verbose:
+	\begin{enumerate}
+	\item print mod(n) with newline
+	\item print private key e with newline
+	\item both should print number of bits and their values in decimal
+	\end{enumerate}
+\item decrypt file using rsa decrypt file()
+\item close pvfile and clear mpz variables
+\end{enumerate}
+
+\end{document}

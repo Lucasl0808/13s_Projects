@@ -1,0 +1,387 @@
+\documentclass[11pt]{article}
+\title{cse13s asgn7 DESIGN.pdf}
+\author{Lucas Lee; CruzID: luclee}
+\date{3/3/2022}
+\begin{document}\maketitle
+\section{Program Details}\label{ss:details}
+We will be using the k-nearest neighbors algorithm to identify the most likely author of an anonymous text.
+\section{Manhattan Distance}\label{ss:manhattan}
+The Manhattan Distance is one of the 3 distance metrics we will use. The main concept for this is that you get the sum of the frequency/total of each word in one vector to those of another.
+\begin{enumerate}
+\item Comparing 2 vectors, get the fractional component of each, and get the absolute value of that number
+\item Repeat this for each vector component and get the fractional sum of the values.
+\item The value of the summation of these numbers is the Manhattan Distance
+\end{enumerate}
+
+\section{Euclidean Distance}\label{ss:euclidean}
+The Euclidean Distance is the default of the 3 metrics we will use. This calculation subtracts the vector components and squares them before getting the total summation, then takes the square root of taht summation
+\begin{enumerate}
+\item Get the difference of two vector components
+\item Square the difference from the step above
+\item Repeat this for all vector components
+\item Sum up all values from the calculation and take the square root of the number to get the Euclidean Distance
+\end{enumerate}
+
+\section{Cosine Distance}\label{ss:Cosine}
+The Cosine Distance is the last of the 3 distance metrics. This calculation multiplies the vector components and subtracts the sum of these numbers from 1 to get the Cosine Distance.
+\begin{enumerate}
+\item Get the product of two vector components
+\item Store the sum of each of the products
+\item Repeat for each of the vector components
+\item Subtract the counting sum of the products from 1 to get Cosine Distance.
+\end{enumerate}
+
+\section{Hash Table}\label{ss:Hashtable}
+We will need to make a Hash Table struct in order to store unique words in a text with the amount to times it is used. Hash tables allow for us to look for these words at a potentially O(1) time complexity.
+\begin{enumerate}
+\item HashTable htcreate(uint32t size)
+	\begin{enumerate}
+	\item constructs a hash table.
+	\item Set size equal to parameter size
+	\item Allocate memory for array of Nodes with capacity of parameter size
+	\item salts.h has the data for salt in the HashTable parameter
+	\item Initialize each slot in the hash table to NULL
+	\item Return the constructed hash table
+	\end{enumerate}
+\item void htdelete(HashTable ht)
+	\begin{enumerate}
+	\item destroys the hash table.
+	\item Free all nodes in the hash table
+	\item After freeing the nodes, set the pointer to ht to NULL
+	\item NOTE: node.c contains a way to free the nodes inside the hash table
+	\end{enumerate}
+\item uint32t htsize(Hashtable ht)
+	\begin{enumerate}
+	\item return the total number of slots in the hash table
+	\item this is given by the size used when creating the hashtable
+	\end{enumerate}
+\item Node htlookup(HashTable ht, char word)
+	\begin{enumerate}
+	\item Searches given hash table for a node that contains the word given as a parameter
+	\item Return the pointer to the node if found, othewise return a NULL pointer
+	\item Hash the word that you want to look up and start from there.
+	\item Start looking through the hash table and if the word in the hash table index matches the word to look up then return that node
+	\item Stop looking when you have iterated through the whole hash table
+	\item NOTE: this may work with a counter to keep track of how many elements are looked at in the hash table.
+	\end{enumerate}
+\item Node htinsert(HashTable ht, char word)
+	\begin{enumerate}
+	\item Insert word into given hash table.
+	\item If the word is already in the table, increment its count by 1.
+	\item Use Linear Probing to traverse the hash table and find a location for the word.
+	\item If Linear Probing fails because hash table is full, Return a NULL pointer.
+	\item Use a counter and index to complete the linear probing.
+	\item If the Node is successfully inserted, return the pointer to that Node.
+	\item Insert the word into the hash table by creating a new node at a NULL index in the hash table
+	\end{enumerate}
+\item void htprint(HashTable ht)
+	\begin{enumerate}
+	\item debug function used to print the contents of the hash table.
+	\item write this immediately after htcreate() to help debug each function.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Hash Table Iterator}\label{ss:iterator}
+Create a struct to assist in iterating over the hash table. This should be created in the same file as the constructor and the other hash table functions.
+\begin{enumerate}
+\item HashTableIterator hticreate(HashTable ht)
+	\begin{enumerate}
+	\item Constructor for the hash table iterator.
+	\item Slot parameter will be initialized to 0.
+	\item HashTable parameter will be set to the given ht parameter
+	\end{enumerate}
+\item void htidelete(HashTableIterator hti)
+	\begin{enumerate}
+	\item Delete the current iterator.
+	\item Do not delete the hash table that corresponds with this iterator.
+	\end{enumerate}
+\item Node htiter(HashTableIterator hti)
+	\begin{enumerate}
+	\item Return the pointer to the node at the next entry in the hash table.
+	\item Incrementing the slot parameter of the iterator may assist in this.
+	\item If the next entry is not valid(there is nothing there) increment the slot parameter and dont return anything.
+	\item Return NULL if the iterator slot is at the max hash table size (iterated over entire table).
+	\item Use a while loop to iterate though the hash table and compare the size of the table to the slot parameter.
+	\end{enumerate}
+\end{enumerate}
+
+\section{SPECK Cipher}\label{ss:speck}
+Using a given SPECK Cipher, we are given a hash function that takes a salt(2 uint64ts) and a key to hash. The hash() function returns a uint32t which is the index where the key is mapped.
+
+\section{Nodes}\label{ss:nodes}
+We will need to create nodes that contain a word and its frequency(count).
+\begin{enumerate}
+\item Node nodecreate(char word)
+	\begin{enumerate}
+	\item Create a copy of the word that is passed into this function as a parameter using strdup()
+	\item Allocate memory for the size of the word and copy the word into char parameter
+	\item Edit: strdup() allocates memory for that character, so just remember to free that character
+	\end{enumerate}
+\item void nodedelete(Node n)
+	\begin{enumerate}
+	\item Destroy a node by freeing the memory for word, and then free the node.
+	\item After memory is freed, set the node pointer to NULL
+	\end{enumerate}
+\item void nodeprint(Node n)
+	\begin{enumerate}
+	\item Debug function that prints out the contents of the node
+	\item Do this function quickly to test if node is functioning properly
+	\end{enumerate}
+\end{enumerate}
+
+\section{Bloom Filters}\label{ss:bloom}
+We will be using Bloom Filters to determine if a word is most likely in the hashtable. The struct for bloom filter will be using 3 different salts to give an estimate of the word.
+\begin{enumerate}
+\item BloomFilter bfcreate(uint32t size)
+	\begin{enumerate}
+	\item Set each of the salts in the struct to the given corresponding salts in salts.h.
+	\item Allocate memory for the bit vector filter that should have the necessary amount of bits for the Bloom filter.
+	\item Edit: memory can be allocated for the bit vector using the corresponding constructor 
+	\end{enumerate}
+\item void bfdelete(BloomFilter bf)
+	\begin{enumerate}
+	\item Destructor for the Bloom filter, freeing memory allocated for the bitvector and any other memory allocated in the constructor.
+	\item Use bit vector destructor to free the bitvector.
+	\item Set pointer to NULL after freeing all necessary memory.
+	\end{enumerate}
+\item uint32t bfsize(BloomFilter bf)
+	\begin{enumerate}
+	\item Return the number of bits that BloomFilter bf can access.
+	\item This is also the length of bit vector
+	\end{enumerate}
+\item void bfinsert(BloomFilter bf, char word)
+	\begin{enumerate}
+	\item Inserts word into the bloom filter.
+	\item Uses hash() on the word for each salt in the bloom filter (hash the word 3 different times)
+	\item Sets the bit at the indices of the bit vector
+	\end{enumerate}
+\item bool bfprobe(BloomFilter bf, char word)
+	\begin{enumerate}
+	\item Run hash() on the word for each salt in the bloom filter similar to bfinsert().
+	\item Check if the bits at the indices are set, and return true if they are all set.
+	\item If not all the bits at those indices are set, return false.
+	\end{enumerate}
+\item void bfprint(BloomFilter bf)
+	\begin{enumerate}
+	\item Debug function that prints out the bits of Bloom filter.
+	\item This may use the print function for debugging in bit vector code.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Bit Vectors}\label{ss:bitvector}
+We need to make a Bit Vector ADT that represents a 1D array of bits. This will be used to indicate true and false through checking if a given bit within a byte is a 1 or 0. Bit shifting logic from code.c in assignment 6 can applicable here.
+\begin{enumerate}
+\item BitVector brcreate(uint32t length)
+	\begin{enumerate}
+	\item Constructor for the bit vector.
+	\item Return NULL in the event that sufficient memory cannot be allocated.
+	\item Otherwise, return a BitVector $\star$ or a pointer to a BitVector that has allocated space.
+	\item Initialize each bit of the vector parameter to 0 (calloc).
+	\item Use ceiling division on the given length to get the space to allocate for the bitvector.
+	\end{enumerate}
+\item void bvdelete(BitVector bv)
+	\begin{enumerate}
+	\item Destructor for the bit vector.
+	\item Free memory allocated with the BitVector bv passed in as a parameter.
+	\item After freeing the memory, set the pointer of bv to NULL.
+	\end{enumerate}
+\item uint32t bvlength(BitVector bv)
+	\begin{enumerate}
+	\item Return the length of the bit vector.
+	\item This is given by the value in the struct length
+	\end{enumerate}
+\item bool bvSetBit(BitVector bv, uint32t i)
+	\begin{enumerate}
+	\item Sets the bit at index i to 1.
+	\item Return false if I is out of range and true if the bit is successfully set.
+	\item Use i mod 8 to get how many bits to shift a temporary number
+	\item Use bitwise or to change a specific bit to 1
+	\end{enumerate}
+\item bool bvClrBit(BitVector bv, uint32t i)
+	\begin{enumerate}
+	\item Clear bit at index i by setting it to 0.
+	\item If I is out of range, return false.
+	\item Return true to indicate successful clearing of a bit.
+	\item Clear bit by subtracting value at bit location from 255(8 bits set to 1)
+	\item Use bitwise and to change specific bit to 0
+	\end{enumerate}
+\item bool bvGetBit(BitVector bv, uint32t i)
+	\begin{enumerate}
+	\item Gets the bit at index i.
+	\item Return false if i is out of range.
+	\item Return true if the value at index i is 1.
+	\item Return false if the value at index i is 0.
+	\item Use bitshifting to shift bits to the right.
+	\item Try to shift the value by as many bits to the right as you need to get the desired bit at index 0
+	\item Check if the number is even or odd to determine the value of the leftmost bit
+	\end{enumerate}
+\item void bvprint(BitVector bv)
+	\begin{enumerate}
+	\item Debug function that prints out the bits in the bit vector.
+	\item Iterates over each byte in the bitvector and individually prints each bit.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Regular Expressions, Parser.c, regex}\label{ss:regex}
+We will have files that allow us to use Regular Expressions to find words, contractions and hyphenations.
+
+\begin{enumerate}
+\item The given parser.h and parser.c have functions to look for words using nextword().
+\item This function takes in a file to read words, and a regular expression.
+\item Use regcomp() to compile the regular expression to pass it into the funciton.
+\end{enumerate}
+
+\section{Text}\label{ss:text}
+We will use a Text struct ADT to keep track of how many words are in each text.
+\begin{enumerate}
+\item Text textcreate(FILE infile, Text noise)
+	\begin{enumerate}
+	\item Constructor for text.
+	\item Get each word using functions in parser.c and regex. Convert all words to lowercase. Use tolower() in a loop to make each character in the word lowercase
+	\item Each lowercased word that is not in the noise parameter is added to the created Text.
+	\item If the Text noise is NULL, then the Text that is created in this function will be the noise.
+	\item If you cannot allocate sufficient memory then the function returns NULL.
+	\item Otherwise, Return a Text pointer or pointer to an allocated Text.
+	\item Hash table should be created with a size of \(2^{19}\), and the Bloom Filter should be created with a size of \(2^{21}\).
+	\item If you are creating a noise text, don't ignore any words, and stop reading and adding new words to the file if the wordcount if the text is the same as the noiselimit
+	\item Otherwise, use the same loop to make words lowercased, and then skip over the words that are inside the noise text
+	\end{enumerate}
+\item void textdelete(Text text)
+	\begin{enumerate}
+	\item Delete a text by freeing hash table, bloom filter, then the text itself.
+	\item After frees, set pointer to NULL.
+	\end{enumerate}
+\item double textdist(Text text1, Text text2, Metric metric)
+	\begin{enumerate}
+	\item Returns the distance between text1 and text2 using one of the 3 metrics specified at the beginning of the document.
+	\item Metric.h provides the metric parameter.
+	\item NOTE: nodes contain counts for their words, and need to normalize it with the total word count in the text
+	\item Iterate through each text using hash table iterators to read the valid words in each text
+	\item Follow the formulas at the beginning of this document to calculate each distance based on the given metric
+	\item Delete hash table iterators after usage
+	\end{enumerate}
+\item double textfrequency(Text text, char word)
+	\begin{enumerate}
+	\item Return frequency of parameter word in parameter text. 
+	\item If word is not in the text, return 0.
+	\item Otherwise return the normalized frequency of word.
+	\item Look up the word in the hash table and store the node with that word inside of a variable
+	\item Use the node's frequency and the text's word count to normalize the count and return that frequency
+	\end{enumerate}
+\item bool textcontains(Text text, char word)
+	\begin{enumerate}
+	\item Return true or false based on if the word is inside the given text or not.
+	\item True if word is in text, false if not.
+	\item Probe the bloomfilter of the text to see if the word is most likely there
+	\item If the word is there, perform a hash table lookup to check for false positives
+	\item otherwise, return false
+	\end{enumerate}
+\item void textprint(Text text)
+	\begin{enumerate}
+	\item Debug function that prints the contents of parameter text.
+	\item Possible to call other debug functions of the other components of text to debug here.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Priority Queue}\label{ss:pq}
+We will need to implement a priority queue similar to assignment 6's priority queue struct.
+This function will most likely contain a local struct in order to keep track of the author and the distance. Memory should not need to be allocated for this struct, so we will not need a destructor for it.
+\begin{enumerate}
+\item PriorityQueue pqcreate(uint32t capacity)
+	\begin{enumerate}
+	\item Constructor for priority queue.
+	\item Priority queue should have an author and the corresponding distance associated with that author as struct parameters.
+	\item Parameter capacity sets the total capacity of the priority queue.
+	\item If memory cannot be allocated return NULL from this function.
+	\item Otherwise, return PriorityQueue pointer or pointer to allocated PriorityQueue.
+	\item Priority queue should be initialized to have 0 elements inside the queue.
+	\item Create an array of structs that contain authors and distances
+	\end{enumerate}
+\item void pqdelete(PriorityQueue q)
+	\begin{enumerate}
+	\item Destructor for PriorityQueue q.
+	\item Free all memory associated with PriorityQueue q.
+	\item All remaining objects in the queue that are leftover must be removed/freed.
+	\item Set the q pointer to NULL after freeing all memory.
+	\end{enumerate}
+\item bool pqempty(PriorityQueue q)
+	\begin{enumerate}
+	\item Return true if PriorityQueue q is empty, and false if there is more than 1 element in the queue.
+	\item It may help and make it easy to do this if a size parameter is added to the struct.
+	\end{enumerate}
+\item bool pqfull(PriorityQueue q)
+	\begin{enumerate}
+	\item Return true if PriorityQueue q is full, and false if there are 0 elements in the queue.
+	\item If a size parameter is added, this will be if the size is equal to the capacity.
+	\end{enumerate}
+\item uint32t pqsize(PriorityQueue q)
+	\begin{enumerate}
+	\item Return the number of elements in PriorityQueue q.
+	\item If a size parameter is added, this will just be the value of the size parameter.
+	\end{enumerate}
+\item bool enqueue(PriorityQueue q, char author, double dist)
+	\begin{enumerate}
+	\item Return false if the PriorityQueue q is full.
+	\item Enqueue the pair of an author and the distance dist corresponding to the author to the queue.
+	\item Return true to indicate the successful enqueue of the author, distance pair.
+	\item Queue should be sorted with highest priority going to the author with the lowest value for dist.
+	\item Edit: Enqueue the struct that contains the author and the distance for that author by setting the element at the index to the constructor function for the struct
+	\end{enumerate}
+\item bool dequeue(PriorityQueue q, char author, double dist)
+	\begin{enumerate}
+	\item Return false if the PriorityQueue q is empty.
+	\item Dequeue an author/dist pair from the queue, shifting every element in the queue over by 1 to accomodate.
+	\item Pass the char author back into the double pointer for author, and pass the distance back with the pointer to dist.
+	\item Return true to indicate the successful dequeue of a pair.
+	\end{enumerate}
+\item pqprint(PriorityQueue q)
+	\begin{enumerate}
+	\item Debug function for checking if the Priority queue is implemented correctly.
+	\end{enumerate}
+\end{enumerate}
+
+\section{Identify(Main function)}\label{ss:main}
+We will make an identify.c function that allows us to find the most likely author of a given text passed into stdin.
+
+\begin{enumerate}
+\item Handle and account for command line options:
+	\begin{enumerate}
+	\item -d = Specify path to database of authors and texts(default = lib.db).
+	\item -n = Specify path to file of noise words (default = noise.txt).
+	\item -k = Specify number of authors to match to the given text (default = 5).
+	\item -l = Specify number of noise words (default = 100).
+	\item -e = Set metric to use as Euclidean distance (default metric).
+	\item -m = Set metric to use as Manhattan distance.
+	\item -c = Set metric to use as Cosine distance.
+	\item -h = Displays help and usage.
+	\item NOTE: for setting the metrics, it should disable the other metrics if selected.
+	\end{enumerate}
+\item Specifics for main function:
+	\begin{enumerate}
+	\item Create a new Text from stdin. This will be the text we will try to identify the author for.
+	\item Create Text for the noise file. This file is specified in the command line inputs. Make all words in noise lowercased.
+	\item Open database for authors and texts specified in command line -d. The first line in the file specifies the number of author/text pairs, we will call this value n.
+	\item Use fscanf to read a single line in from the database and store that value inside n.
+	\item Create a PQ that holds n elements. This makes it so that we can look through all the authors in the database.
+	\item Read in the rest of the file to get the authors and their texts. Use a loop with a counting variable inside that counts until you reach n pairs.
+		\begin{enumerate}
+		\item Use fgets() once to get the author, and use it again to get the path to the text for that author.
+		\item The call to fgets() keeps the newline characters, so we will need to remove it.
+		\item NOTE: fgets() stores string into a buffer, and the second to last element in that buffer will be a newline, since the last element in the buffer is a null pointer.
+		\item NOTE 2: duplicate the string that you are trying to store with the author to enqueue, or it could overwrite the other authors in the priority queue after enqueuing.
+		\item Open the author's text and create a new Text with the file.
+		\item If the file fails to open, then skip over it and continue reading the database.
+		\item If the file opens, make sure that the parsed words are lowercased before adding the word to Text
+		\item Use the author's text and the anonymous text from stdin to compute a distance after filtering noise words.
+		\item Enqueue that author's name and the corresponding distance to the PQ.
+		\item Delete the text created from the author's text to make room to create another.
+		\end{enumerate}
+	\item After reading through the entire database, we should have a PQ of the most likely authors for the text.
+	\item Dequeue from PQ k number of times to get the most likely authors.
+	\item For each element dequeued from the priority queue,  free the character pointer for the author to avoid leaks with the string duplicate.
+	\item Close all opened files, delete all created texts, and delete the priority queue.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
+
