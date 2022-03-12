@@ -5,23 +5,23 @@
 
 #include "node.h"
 
-Node *node_create(char *word){
-	Node *n = (Node *)malloc(sizeof(Node));
-	char *temp_word = strdup(word);
-	n->word = temp_word;
-	n->count = 0;
-	return n;
+Node *node_create(char *word) {
+    Node *n = (Node *) malloc(sizeof(Node));
+    char *temp_word = strdup(word);
+    n->word = temp_word;
+    n->count = 0;
+    return n;
 }
 
-void node_print(Node *n){
-	printf("Node word = %s\n", n->word);
-	printf("Node count = %"PRIu32"\n", n->count);
+void node_print(Node *n) {
+    printf("Node word = %s\n", n->word);
+    printf("Node count = %" PRIu32 "\n", n->count);
 }
 
-void node_delete(Node **n){
-	free((*n)->word);
-	free(*n);
-	*n = NULL;
+void node_delete(Node **n) {
+    free((*n)->word);
+    free(*n);
+    *n = NULL;
 }
 /*
 int main(void){

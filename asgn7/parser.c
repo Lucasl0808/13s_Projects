@@ -15,11 +15,11 @@ static inline int min(int x, int y) {
 static char words[BLOCK][BLOCK];
 
 char *next_word(FILE *infile, regex_t *word_regex) {
-    static uint32_t index = 0;  // Track the word to return.
-    static uint32_t count = 0;  // How many words have we stored?
-    static char buffer[BLOCK];  // Internal buffer to read into.
-    static char *cursor;        // Tracks position in buffer.
-    static regmatch_t match;    // Struct to track regex matches.
+    static uint32_t index = 0; // Track the word to return.
+    static uint32_t count = 0; // How many words have we stored?
+    static char buffer[BLOCK]; // Internal buffer to read into.
+    static char *cursor; // Tracks position in buffer.
+    static regmatch_t match; // Struct to track regex matches.
 
     if (!index) {
         int matches = 0; // Assume no matches yet.
@@ -45,8 +45,8 @@ char *next_word(FILE *infile, regex_t *word_regex) {
                 }
 
                 // Range for the match.
-                int start  = match.rm_so;
-                int end    = match.rm_eo;
+                int start = match.rm_so;
+                int end = match.rm_eo;
                 int length = end - start;
 
                 // Copy it in, tack on null-terminator.
